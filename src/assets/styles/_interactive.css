@@ -1,0 +1,29 @@
+input {
+  @apply w-full px-3 py-2
+		rounded-md border-solid border-2 border-slate-300
+		hover:border-teal-500
+		focus:outline-2 focus:outline-rose-500;
+}
+
+button:not(.icon) {
+  @apply px-4 py-2
+		bg-rose-500 rounded-md text-white
+		hover:bg-rose-600
+		active:drop-shadow-md
+		focus:outline-2 focus:outline-teal-800;
+}
+
+button.icon {
+  @apply rounded-full p-2
+		hover:bg-slate-900 hover:bg-opacity-20;
+}
+
+a {
+  @apply cursor-pointer hover:underline;
+}
+
+input,
+button,
+a {
+  @apply transition-colors;
+}

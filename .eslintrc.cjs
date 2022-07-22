@@ -4,6 +4,7 @@ module.exports = {
 	parser: '@typescript-eslint/parser',
 	extends: [
 		'airbnb-base',
+		'airbnb-typescript/base',
 		'eslint:recommended',
 		'plugin:@typescript-eslint/recommended',
 	],
@@ -14,9 +15,19 @@ module.exports = {
 	overrides: [{
 		files: ['*.svelte'],
 		processor: 'svelte3/svelte3',
+		rules: {
+			'import/no-mutable-exports': 'off',
+			'no-multiple-empty-lines': ['error', { max: 2, maxBOF: 2, maxEOF: 0 }],
+			'import/first': 'off',
+		},
 	}],
 	settings: {
 		'svelte3/typescript': true,
+		'import/resolver': {
+			typescript: {
+				project: ['./tsconfig.eslint.json'],
+			},
+		},
 	},
 	parserOptions: {
 		sourceType: 'module',
@@ -31,9 +42,11 @@ module.exports = {
 		node: true,
 	},
 	rules: {
-		indent: ['error', 'tab'],
+		indent: 'off',
 		'no-tabs': 'off',
+		'@typescript-eslint/indent': ['error', 'tab'],
+		'no-console': 'off',
 		'import/prefer-default-export': 'off',
-		'import/no-mutable-exports': 'off',
+		'import/no-extraneous-dependencies': 'off',
 	},
 };
