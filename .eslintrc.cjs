@@ -30,7 +30,9 @@ module.exports = {
 		node: true,
 	},
 	rules: {
-		'no-tabs': 'off',
 		indent: ['error', 'tab'],
+		'no-tabs': 'off',
+		'import/prefer-default-export': 'off',
+		'import/no-mutable-exports': 'off',
 	},
 };
