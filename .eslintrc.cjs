@@ -1,20 +1,36 @@
 module.exports = {
 	root: true,
 	parser: '@typescript-eslint/parser',
-	extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
-	plugins: ['svelte3', '@typescript-eslint'],
-	ignorePatterns: ['*.cjs'],
-	overrides: [{ files: ['*.svelte'], processor: 'svelte3/svelte3' }],
+	extends: [
+		'airbnb-base',
+		'eslint:recommended',
+		'plugin:@typescript-eslint/recommended',
+	],
+	plugins: [
+		'svelte3',
+		'@typescript-eslint',
+	],
+	overrides: [{
+		files: ['*.svelte'],
+		processor: 'svelte3/svelte3',
+	}],
 	settings: {
-		'svelte3/typescript': () => require('typescript')
+		'svelte3/typescript': true,
 	},
 	parserOptions: {
 		sourceType: 'module',
-		ecmaVersion: 2020
+		ecmaVersion: 2020,
+		tsconfigRootDir: __dirname,
+		project: ['./tsconfig.eslint.json'],
+		extraFileExtensions: ['.svelte'],
 	},
 	env: {
 		browser: true,
-		es2017: true,
-		node: true
-	}
+		es2021: true,
+		node: true,
+	},
+	rules: {
+		'no-tabs': 'off',
+		indent: ['error', 'tab'],
+	},
 };
