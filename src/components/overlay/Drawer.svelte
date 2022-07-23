@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
-	import { directedSlide } from '@/transitions/directed-slide';
+	import { directedSlide } from '$/transitions/directed-slide';
 	
 	export let from: 'top' | 'bottom' | 'right' | 'left' = 'top';
 	export let isOpen = false;

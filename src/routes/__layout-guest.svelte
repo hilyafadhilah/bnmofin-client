@@ -1,6 +1,13 @@
 <script lang="ts">
-	import '@/app.css';
-	import CompactHeader from '@/components/layout/CompactHeader.svelte';
+	import '$/app.css';
+	import CompactHeader from '$/components/layout/CompactHeader.svelte';
+	import { auth } from '$/stores/auth';
+	import { browser } from '$app/env';
+	import { goto } from '$app/navigation';
+
+	$: if (browser && $auth) {
+		goto('/');
+	}
 </script>
 
 <div class="w-full min-h-screen px-4 bg-teal-900">

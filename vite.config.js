@@ -7,7 +7,7 @@ const config = {
 	plugins: [sveltekit()],
 	resolve: {
 		alias: {
-			'@': path.resolve('src'),
+			$: path.resolve('src'),
 		},
 	},
 };

@@ -27,6 +27,12 @@ module.exports = {
 			typescript: {
 				project: ['./tsconfig.eslint.json'],
 			},
+			alias: {
+				map: [
+					['\$app/env', '@sveltejs/kit'], // @TODO
+				],
+				extensions: ['.ts', '.js', '.svelte', '.json'],
+			},
 		},
 	},
 	parserOptions: {

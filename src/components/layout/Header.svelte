@@ -1,23 +1,21 @@
 <script lang="ts">
-import { document } from '@/stores/document';
+	import Burger from '$/components/icons/Burger.svelte';
+	import Close from '$/components/icons/Close.svelte';
+	import Drawer from '$/components/overlay/Drawer.svelte';
+	import { browser } from '$app/env';
 
-import Burger from '@/components/icons/Burger.svelte';
-import Close from '@/components/icons/Close.svelte';
-import Drawer from '@/components/overlay/Drawer.svelte';
+	let isOpen = false;
+	const duration = 500;
 
-let isOpen = false;
-const duration = 500;
-
-$: if ($document) {
-	if (isOpen) {
-		$document.body.classList.add('overflow-y-hidden');
-	} else {
-		setTimeout(() => {
-			$document?.body.classList.remove('overflow-y-hidden');
-		}, duration);
+	$: if (browser) {
+		if (isOpen) {
+			document.body.classList.add('overflow-y-hidden');
+		} else {
+			setTimeout(() => {
+				document.body.classList.remove('overflow-y-hidden');
+			}, duration);
+		}
 	}
-}
-
 </script>
 
 <svelte:body class="bg-black" />
@@ -40,6 +38,7 @@ $: if ($document) {
 			<nav class="hidden md:flex justify-end gap-4 flex-grow pr-4">
 				<a>Transactions</a>
 				<a>Profile</a>
+				<a href="/logout">Logout</a>
 			</nav>
 			<div class="md:hidden flex justify-end flex-grow">
 				<button
