@@ -1,4 +1,6 @@
-main,
-header {
-	@apply max-w-7xl mx-auto;
+@layer base {
+	main,
+	header {
+		@apply max-w-7xl mx-auto;
+	}
 }

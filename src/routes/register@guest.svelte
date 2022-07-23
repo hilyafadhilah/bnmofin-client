@@ -144,7 +144,7 @@
 					/>
 				</div>
 			{/if}
-			<button class="mt-2" on:click={submitHandler}> Submit </button>
+			<button class="primary mt-2" on:click={submitHandler}> Submit </button>
 		</div>
 	</div>
 </div>

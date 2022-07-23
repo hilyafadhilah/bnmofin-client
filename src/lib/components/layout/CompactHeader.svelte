@@ -1,7 +1,11 @@
+<script lang="ts">
+	import bnmo from "$root/assets/images/bnmo.png";
+</script>
+
 <header class={$$props.class}>
 	<div class="w-fit mx-auto flex flex-col">
 		<div class="flex flex-col items-center sm:flex-row sm:items-end font-serif">
-			<img src="/bnmo.png" alt="BNMO" class="h-24 w-24 sm:h-32 sm:w-32" />
+			<img src={bnmo} alt="BNMO" class="h-24 w-24 sm:h-32 sm:w-32" />
 			<div class="pb-2 flex flex-col items-center sm:items-start">
 				<div class="text-4xl sm:text-5xl">bNM0</div>
 				<div class="text-2xl -mt-2 sm:text-4xl">wAllet</div>

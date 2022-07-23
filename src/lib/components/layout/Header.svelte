@@ -2,6 +2,7 @@
 	import Burger from "$lib/components/icons/Burger.svelte";
 	import Close from "$lib/components/icons/Close.svelte";
 	import Drawer from "$lib/components/overlay/Drawer.svelte";
+	import bnmo from "$root/assets/images/bnmo.png";
 	import { browser } from "$app/env";
 
 	type NavigationLink = { label: string; href: string };
@@ -26,7 +27,7 @@
 <header class="flex items-center {$$props.class}">
 	<div class="w-full px-2 flex flex-row items-center">
 		<div class="h-8 sm:h-10">
-			<img src="/bnmo.png" alt="BNMO" class="h-full w-auto" />
+			<img src={bnmo} alt="BNMO" class="h-full w-auto" />
 		</div>
 		<div class="w-full flex items-center">
 			<div class="flex flex-col ml-2 font-serif">

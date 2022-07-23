@@ -56,7 +56,7 @@
 				<FormItem label="Password" id="password">
 					<input id="password" type="password" bind:value={password} />
 				</FormItem>
-				<button type="submit" class="mt-2"> Submit </button>
+				<button type="submit" class="primary mt-2"> Submit </button>
 			</div>
 		</form>
 	{/if}
