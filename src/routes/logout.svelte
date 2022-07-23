@@ -4,7 +4,9 @@
 
 	export const load: Load = () => {
 		auth.logout();
-		return {};
+		return {
+			stuff: { title: "Logout" },
+		};
 	};
 </script>
 

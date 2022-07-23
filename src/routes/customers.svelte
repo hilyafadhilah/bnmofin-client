@@ -3,13 +3,7 @@
 
 	export const load: Load = () => {
 		return {
-			stuff: { title: "Home" },
+			stuff: { title: "Customers" },
 		};
 	};
 </script>
-
-<script lang="ts">
-	import { auth } from "$lib/stores/auth";
-</script>
-
-Hi, {$auth?.user.username}.

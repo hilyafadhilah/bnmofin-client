@@ -1,9 +1,18 @@
+<script lang="ts" context="module">
+	import type { Load } from "@sveltejs/kit";
+
+	export const load: Load = () => {
+		return {
+			stuff: { title: "Register" },
+		};
+	};
+</script>
+
 <script lang="ts">
-	import Head from "$lib/components/Head.svelte";
 	import FormItem from "$lib/components/input/FormItem.svelte";
 	import { getReadableFileSize, kilobyte } from "$lib/utils/file";
 	import { api } from "$lib/services/api";
-	import { AppError } from "$root/lib/models/error";
+	import { AppError } from "$lib/models/error";
 
 	let username = "";
 	let password = "";
@@ -55,7 +64,6 @@
 	};
 </script>
 
-<Head title="Login" />
 <div>
 	<h3 class="mb-2">Sign Up</h3>
 	<hr class="mb-4" />
