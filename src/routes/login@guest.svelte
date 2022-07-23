@@ -10,7 +10,9 @@
 	let status = "";
 	let error: AppError;
 
-	const submitHandler = async () => {
+	const submitHandler = async (e: SubmitEvent) => {
+		e.preventDefault();
+
 		try {
 			status = "loading";
 			await auth.login(username, password);
@@ -38,7 +40,7 @@
 			</div>
 			<hr class="mt-2 mb-4" />
 		{/if}
-		<form>
+		<form on:submit={submitHandler}>
 			<div class="flex flex-col">
 				<FormItem label="Username" id="username">
 					<input id="username" bind:value={username} />
@@ -46,7 +48,7 @@
 				<FormItem label="Password" id="password">
 					<input id="password" type="password" bind:value={password} />
 				</FormItem>
-				<button class="mt-2" on:click={submitHandler}> Submit </button>
+				<button type="submit" class="mt-2"> Submit </button>
 			</div>
 		</form>
 	{/if}

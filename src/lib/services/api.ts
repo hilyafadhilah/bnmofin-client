@@ -4,7 +4,7 @@ import type { Auth, AuthUser, LoginPayload } from "$lib/models/auth";
 import type { RegisterPayload } from "../models/customer";
 
 const fetch = axios.create({
-	baseURL: "http://localhost:3030/",
+	baseURL: import.meta.env.VITE_API_URL,
 	timeout: 5000,
 });
 

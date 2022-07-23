@@ -4,6 +4,9 @@
 	import { auth } from "$lib/stores/auth";
 	import { browser } from "$app/env";
 	import { goto } from "$app/navigation";
+	import { firebase } from "$lib/services/firebase";
+
+	firebase.init();
 
 	let loading = browser;
 	$: loading = $auth === undefined;
