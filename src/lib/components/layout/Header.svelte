@@ -4,6 +4,9 @@
 	import Drawer from "$lib/components/overlay/Drawer.svelte";
 	import { browser } from "$app/env";
 
+	type NavigationLink = { label: string; href: string };
+	export let navigationLinks = [] as NavigationLink[];
+
 	let isOpen = false;
 	const duration = 500;
 
@@ -30,9 +33,9 @@
 				<div class="text-2xl sm:text-4xl">bNM0 wAllet</div>
 			</div>
 			<nav class="hidden md:flex justify-end gap-4 flex-grow pr-4">
-				<a>Transactions</a>
-				<a>Profile</a>
-				<a href="/logout">Logout</a>
+				{#each navigationLinks as { label, href }}
+					<a {href}>{label}</a>
+				{/each}
 			</nav>
 			<div class="md:hidden flex justify-end flex-grow">
 				<button
@@ -61,8 +64,9 @@
 			</button>
 		</div>
 		<nav class="flex flex-col gap-2 px-2">
-			<a class="text-lg">Transactions</a>
-			<a class="text-lg">Profile</a>
+			{#each navigationLinks as { label, href }}
+				<a {href} class="text-lg">{label}</a>
+			{/each}
 		</nav>
 	</div>
 </Drawer>

@@ -22,12 +22,14 @@ export type ApiResponse<T> = T extends Array<infer I>
 	? ApiCollectionResponse<I>
 	: ApiSingularResponse<T>;
 
+export interface ApiError {
+	name: string;
+	title: string;
+	message: string;
+}
+
 export interface ErrorResponse<T = any> {
-	error: {
-		name: string;
-		title: string;
-		message: string;
-	};
+	error: ApiError;
 	meta: {
 		timestamp: Date;
 	};
