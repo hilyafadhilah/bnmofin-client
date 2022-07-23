@@ -1,10 +1,10 @@
 <script lang="ts">
-	import Head from '$/components/Head.svelte';
-	import FormItem from '$/components/input/FormItem.svelte';
-	import { auth } from '$/stores/auth';
+	import Head from "$lib/components/Head.svelte";
+	import FormItem from "$lib/components/input/FormItem.svelte";
+	import { auth } from "$lib/stores/auth";
 
-	let username = '';
-	let password = '';
+	let username = "";
+	let password = "";
 
 	const submitHandler = () => {
 		auth.login(username, password);
@@ -22,8 +22,6 @@
 		<FormItem label="Password" id="password">
 			<input id="password" type="password" bind:value={password} />
 		</FormItem>
-		<button class="mt-2" on:click={submitHandler}>
-			Submit
-		</button>
+		<button class="mt-2" on:click={submitHandler}> Submit </button>
 	</div>
 </div>

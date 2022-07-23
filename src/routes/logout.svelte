@@ -1,7 +1,6 @@
 <script lang="ts" context="module">
-	import { auth } from '$/stores/auth';
-
-	import type { Load } from '@sveltejs/kit';
+	import type { Load } from "@sveltejs/kit";
+	import { auth } from "$lib/stores/auth";
 
 	export const load: Load = () => {
 		auth.logout();

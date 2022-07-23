@@ -1,8 +1,8 @@
-/* eslint-disable import/no-extraneous-dependencies */
-import adapter from '@sveltejs/adapter-auto';
-import preprocess from 'svelte-preprocess';
-import tailwindcss from 'tailwindcss';
-import autoprefixer from 'autoprefixer';
+import path from "path";
+import adapter from "@sveltejs/adapter-auto";
+import preprocess from "svelte-preprocess";
+import tailwindcss from "tailwindcss";
+import autoprefixer from "autoprefixer";
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -16,6 +16,9 @@ const config = {
 
 	kit: {
 		adapter: adapter(),
+		alias: {
+			$root: path.resolve("src"),
+		},
 	},
 };
 

@@ -1,13 +1,12 @@
 <script lang="ts">
-	import '$/app.css';
-	import Header from '$/components/layout/Header.svelte';
-	import { auth } from '$/stores/auth';
-	import { browser } from '$app/env';
-	import { goto } from '$app/navigation';
+	import "$root/app.css";
+	import Header from "$lib/components/layout/Header.svelte";
+	import { auth } from "$lib/stores/auth";
+	import { browser } from "$app/env";
+	import { goto } from "$app/navigation";
 
-	$: console.log($auth);
 	$: if (browser && $auth === null) {
-		goto('/login');
+		goto("/login");
 	}
 </script>
 

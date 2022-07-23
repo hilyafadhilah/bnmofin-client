@@ -1,8 +1,8 @@
-import type { Auth } from '$/models/auth';
-import { api } from '$/services/api';
-import { writable } from 'svelte/store';
-import * as Cookies from 'es-cookie';
-import { browser } from '$app/env';
+import { writable } from "svelte/store";
+import * as Cookies from "es-cookie";
+import type { Auth } from "$lib/models/auth";
+import { api } from "$lib/services/api";
+import { browser } from "$app/env";
 
 function createAuth() {
 	const auth = writable<Auth | null | undefined>();
@@ -26,9 +26,9 @@ function createAuth() {
 	auth.subscribe((value) => {
 		if (browser && value !== undefined) {
 			if (value) {
-				Cookies.set('token', value.token);
+				Cookies.set("token", value.token);
 			} else {
-				Cookies.remove('token');
+				Cookies.remove("token");
 			}
 		}
 	});
@@ -98,7 +98,7 @@ function createAuth() {
 	};
 
 	if (browser) {
-		fetch(Cookies.get('token'));
+		fetch(Cookies.get("token"));
 	}
 
 	return {

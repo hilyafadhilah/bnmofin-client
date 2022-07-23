@@ -1,18 +1,18 @@
 <script lang="ts">
-	import Burger from '$/components/icons/Burger.svelte';
-	import Close from '$/components/icons/Close.svelte';
-	import Drawer from '$/components/overlay/Drawer.svelte';
-	import { browser } from '$app/env';
+	import Burger from "$lib/components/icons/Burger.svelte";
+	import Close from "$lib/components/icons/Close.svelte";
+	import Drawer from "$lib/components/overlay/Drawer.svelte";
+	import { browser } from "$app/env";
 
 	let isOpen = false;
 	const duration = 500;
 
 	$: if (browser) {
 		if (isOpen) {
-			document.body.classList.add('overflow-y-hidden');
+			document.body.classList.add("overflow-y-hidden");
 		} else {
 			setTimeout(() => {
-				document.body.classList.remove('overflow-y-hidden');
+				document.body.classList.remove("overflow-y-hidden");
 			}, duration);
 		}
 	}
@@ -23,15 +23,9 @@
 <header class="flex items-center {$$props.class}">
 	<div class="w-full px-2 flex flex-row items-center">
 		<div class="h-8 sm:h-10">
-			<img
-				src="/bnmo.png"
-				alt="BNMO"
-				class="h-full w-auto"
-			/>
+			<img src="/bnmo.png" alt="BNMO" class="h-full w-auto" />
 		</div>
-		<div
-			class="w-full flex items-center"
-		>
+		<div class="w-full flex items-center">
 			<div class="flex flex-col ml-2 font-serif">
 				<div class="text-2xl sm:text-4xl">bNM0 wAllet</div>
 			</div>
@@ -43,7 +37,9 @@
 			<div class="md:hidden flex justify-end flex-grow">
 				<button
 					class="icon"
-					on:click={() => { isOpen = true; }}
+					on:click={() => {
+						isOpen = true;
+					}}
 				>
 					<Burger />
 				</button>
@@ -57,7 +53,9 @@
 		<div class="self-end mb-2">
 			<button
 				class="icon text-teal-900"
-				on:click={() => { isOpen = false; }}
+				on:click={() => {
+					isOpen = false;
+				}}
 			>
 				<Close />
 			</button>
