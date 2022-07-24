@@ -13,6 +13,7 @@
 	import { getReadableFileSize, kilobyte } from "$lib/utils/file";
 	import { api } from "$lib/services/api";
 	import { AppError } from "$lib/models/error";
+	import SpinnerOverlay from "$root/lib/components/overlay/SpinnerOverlay.svelte";
 
 	let username = "";
 	let password = "";
@@ -64,12 +65,12 @@
 	};
 </script>
 
+<SpinnerOverlay loading={status === "loading"} />
+
 <div>
 	<h3 class="mb-2">Sign Up</h3>
 	<hr class="mb-4" />
-	{#if status === "loading"}
-		Loading...
-	{:else if status === "success"}
+	{#if status === "success"}
 		<div class="flex flex-col items-center">
 			<div>Successfully signed up!</div>
 			<div>
@@ -82,7 +83,7 @@
 		must use hidden class to prevent rerendering
 		@see https://stackoverflow.com/a/42777812
 	-->
-	<div class:hidden={status === "loading" || status === "success"}>
+	<div class:hidden={status === "success"}>
 		{#if error}
 			<div class="flex flex-col items-center text-red-500">
 				<div class="font-serif font-bold">{error.title}</div>
