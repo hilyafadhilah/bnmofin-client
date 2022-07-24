@@ -2,6 +2,7 @@
 	import { api } from "$lib/services/api";
 
 	import type { Load } from "@sveltejs/kit";
+	import type { AdminCustomerResponse } from "$lib/models/customer";
 
 	export const load: Load = ({ session }) => {
 		return {
@@ -17,12 +18,12 @@
 
 <script lang="ts">
 	import { getStorage, ref, getDownloadURL } from "firebase/storage";
-	import type { AdminCustomerResponse } from "$lib/models/customer";
 	import Spin from "$lib/components/icons/Spin.svelte";
 	import Overlay from "$lib/components/overlay/Overlay.svelte";
 	import ConfirmDialog from "$lib/components/overlay/ConfirmDialog.svelte";
 	import { AppError } from "$lib/models/error";
 	import { session } from "$app/stores";
+	import { idrFormat } from "$root/lib/utils/data";
 
 	export let customers: Promise<AdminCustomerResponse[]>;
 
@@ -90,6 +91,7 @@
 			<tr>
 				<th>Username</th>
 				<th>Fullname</th>
+				<th>Balance</th>
 				<th />
 				<th />
 			</tr>
@@ -99,6 +101,11 @@
 				<tr>
 					<td>{customer.user.username}</td>
 					<td>{customer.fullname}</td>
+					<td
+						>{customer.status === "verified"
+							? idrFormat(customer.balance)
+							: "-"}</td
+					>
 					<td>
 						<button class="primary" on:click={() => loadImage(customer)}
 							>View ID Card</button
@@ -132,9 +139,10 @@
 		<div class="w-fit">
 			<img
 				{src}
+				alt="ID Card of {selected?.fullname}"
 				on:load={() => (imgLoaded = true)}
-				alt=""
-				class="max-w-xl max-h-96"
+				class:opacity-0={!imgLoaded}
+				class="max-w-xl max-h-96 transition-opacity"
 				style:min-width="248px"
 			/>
 			{#if imgLoaded && selected?.status === "unverified"}

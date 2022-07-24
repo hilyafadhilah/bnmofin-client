@@ -66,7 +66,7 @@ export interface ApiBodyOptions<T> extends ApiOptions {
 	payload?: T;
 }
 
-async function send<Response, Payload = any>(
+async function send<Payload = any, Response = any>(
 	endpoint: string,
 	options: ApiBodyOptions<Payload> = {
 		method: "post",
