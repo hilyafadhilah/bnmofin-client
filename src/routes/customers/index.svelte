@@ -37,7 +37,7 @@
 	import Pagination from "$lib/components/data/Pagination.svelte";
 
 	export let data: Promise<ApiResponse<AdminCustomerResponse[]>>;
-	export let customers: AdminCustomerResponse[];
+	let customers: AdminCustomerResponse[];
 
 	export let page: number;
 	export let pageSize: number;

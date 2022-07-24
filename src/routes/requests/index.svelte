@@ -40,7 +40,7 @@
 	import type { ApiResponse } from "$lib/models/api";
 
 	export let data: Promise<ApiResponse<AdminRequestResponse[]>>;
-	export let requests: AdminRequestResponse[];
+	let requests: AdminRequestResponse[];
 
 	export let page: number;
 	export let pageSize: number;
