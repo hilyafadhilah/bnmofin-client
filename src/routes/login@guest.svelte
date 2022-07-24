@@ -10,9 +10,11 @@
 
 <script lang="ts">
 	import FormItem from "$lib/components/input/FormItem.svelte";
-	import { auth } from "$lib/stores/auth";
 	import { AppError } from "$lib/models/error";
 	import SpinnerOverlay from "$lib/components/overlay/SpinnerOverlay.svelte";
+	import { session } from "$app/stores";
+	import { api } from "$lib/services/api";
+	import { set as setCookie } from "es-cookie";
 
 	let username = "";
 	let password = "";
@@ -26,7 +28,13 @@
 		try {
 			loading = true;
 			error = null;
-			await auth.login(username, password);
+
+			const auth = await api.login({ username, password });
+			session.update((value) => {
+				value.auth = auth;
+				return value;
+			});
+			setCookie("token", auth.token);
 		} catch (err) {
 			error = new AppError(err);
 		} finally {

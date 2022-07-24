@@ -2,12 +2,11 @@
 	import "$root/app.css";
 	import Head from "$lib/components/Head.svelte";
 	import CompactHeader from "$lib/components/layout/CompactHeader.svelte";
-	import { auth } from "$lib/stores/auth";
 	import { browser } from "$app/env";
 	import { goto } from "$app/navigation";
-	import { page } from "$app/stores";
+	import { page, session } from "$app/stores";
 
-	$: if (browser && $auth) {
+	$: if (browser && $session.auth) {
 		goto("/");
 	}
 </script>

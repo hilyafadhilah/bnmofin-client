@@ -13,7 +13,7 @@
 	import { getReadableFileSize, kilobyte } from "$lib/utils/file";
 	import { api } from "$lib/services/api";
 	import { AppError } from "$lib/models/error";
-	import SpinnerOverlay from "$root/lib/components/overlay/SpinnerOverlay.svelte";
+	import SpinnerOverlay from "$lib/components/overlay/SpinnerOverlay.svelte";
 
 	let username = "";
 	let password = "";

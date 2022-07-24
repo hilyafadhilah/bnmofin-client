@@ -1,7 +1,12 @@
+export enum AuthRole {
+	Admin = "Admin",
+	Customer = "VerifiedCustomer",
+}
+
 export interface AuthUser {
 	id: number;
 	username: string;
-	role: string;
+	role: AuthRole;
 	created: Date;
 }
 

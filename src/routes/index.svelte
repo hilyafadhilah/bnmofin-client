@@ -9,7 +9,7 @@
 </script>
 
 <script lang="ts">
-	import { auth } from "$lib/stores/auth";
+	import { session } from "$app/stores";
 </script>
 
-Hi, {$auth?.user.username}.
+Hi, {$session.auth?.user.username}.

@@ -1,19 +1,30 @@
+<script lang="ts" context="module">
+	import type { Load } from "@sveltejs/kit";
+	import { firebase } from "$lib/services/firebase";
+
+	export const load: Load = ({ session }) => {
+		if (!session.auth) {
+			return {
+				status: 307,
+				redirect: "/login",
+			};
+		}
+
+		firebase.init();
+
+		return {};
+	};
+</script>
+
 <script lang="ts">
 	import "$root/app.css";
 	import Head from "$lib/components/Head.svelte";
 	import Header from "$lib/components/layout/Header.svelte";
-	import { auth } from "$lib/stores/auth";
 	import { browser } from "$app/env";
 	import { goto } from "$app/navigation";
-	import { firebase } from "$lib/services/firebase";
-	import { page } from "$app/stores";
+	import { page, session } from "$app/stores";
 
-	firebase.init();
-
-	let loading = browser;
-	$: loading = $auth === undefined;
-
-	$: if (browser && $auth === null) {
+	$: if (browser && !$session.auth) {
 		goto("/login");
 	}
 
@@ -24,7 +35,7 @@
 		{ href: "/logout", label: "Logout" },
 	];
 
-	$: if ($auth?.user.role === "Admin") {
+	$: if ($session.auth?.user.role === "Admin") {
 		navigationLinks.splice(1, 0, { href: "/customers", label: "Customers" });
 		navigationLinks = navigationLinks;
 	}
@@ -37,9 +48,5 @@
 </div>
 
 <main>
-	{#if loading}
-		Loading...
-	{:else}
-		<slot />
-	{/if}
+	<slot />
 </main>

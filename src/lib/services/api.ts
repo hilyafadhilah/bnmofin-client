@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { type AxiosRequestConfig } from "axios";
 import type { ApiResponse } from "$lib/models/api";
 import type { Auth, AuthUser, LoginPayload } from "$lib/models/auth";
 import type { RegisterPayload } from "../models/customer";
@@ -39,8 +39,31 @@ async function register(payload: RegisterPayload) {
 	return data.data;
 }
 
+export interface ApiOptions {
+	auth?: Auth;
+	query?: Record<string, unknown>;
+}
+
+async function get<T>(endpoint: string, options?: ApiOptions) {
+	const config: AxiosRequestConfig = {};
+
+	if (options?.auth) {
+		config.headers = {
+			Authorization: `Bearer ${options.auth.token}`,
+		};
+	}
+
+	if (options?.query) {
+		config.params = options.query;
+	}
+
+	const { data } = await fetch.get<ApiResponse<T>>(endpoint, config);
+	return data.data;
+}
+
 export const api = {
 	login,
 	getAuthUser,
 	register,
+	get,
 };
