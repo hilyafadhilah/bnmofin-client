@@ -4,55 +4,71 @@
 	import type { Load } from "@sveltejs/kit";
 	import type { AdminCustomerResponse } from "$lib/models/customer";
 
-	export const load: Load = ({ session }) => {
+	export const load: Load = async ({ session }) => {
+		const pagination = {
+			page: 1,
+			pageSize: 25,
+		};
+
+		// @TODO handle error...
+		const customers = await api.getMany<AdminCustomerResponse[]>("/customer", {
+			auth: session.auth,
+			...pagination,
+		});
+
 		return {
 			stuff: { title: "Customers" },
 			props: {
-				customers: api.get<AdminCustomerResponse[]>("/customer", {
-					auth: session.auth,
-				}),
+				data: new Promise((resolve) => resolve(customers)),
+				...pagination,
 			},
 		};
 	};
 </script>
 
 <script lang="ts">
-	import { getStorage, ref, getDownloadURL } from "firebase/storage";
 	import Spin from "$lib/components/icons/Spin.svelte";
-	import Overlay from "$lib/components/overlay/Overlay.svelte";
 	import ConfirmDialog from "$lib/components/overlay/ConfirmDialog.svelte";
 	import { AppError } from "$lib/models/error";
 	import { session } from "$app/stores";
-	import { idrFormat } from "$root/lib/utils/data";
+	import { idrFormat } from "$lib/utils/data";
+	import ViewCustomerDialog from "$lib/components/view/ViewCustomerDialog.svelte";
+	import type { ApiResponse } from "$lib/models/api";
+	import Pagination from "$lib/components/data/Pagination.svelte";
 
-	export let customers: Promise<AdminCustomerResponse[]>;
+	export let data: Promise<ApiResponse<AdminCustomerResponse[]>>;
+	export let customers: AdminCustomerResponse[];
+
+	export let page: number;
+	export let pageSize: number;
+	let totalItems = 0;
+
+	$: {
+		data.then(({ meta, data }) => {
+			// assert(page === meta.page)
+			// assert(pageSize === meta.pageSize)
+			totalItems = meta.totalItems;
+			customers = data;
+		});
+	}
 
 	const reload = () => {
-		customers = api.get<AdminCustomerResponse[]>("/customer", {
+		data = api.getMany<AdminCustomerResponse[]>("/customer", {
 			auth: $session.auth,
+			page,
+			pageSize,
 		});
 	};
 
+	// view
+
 	let selected: AdminCustomerResponse | null = null;
+	let showDetails = false;
 
-	// image
-
-	const storage = getStorage();
-
-	let showImage = false;
-	let src: string;
-	let imgLoaded = false;
-
-	const loadImage = async (customer: AdminCustomerResponse) => {
+	const openDetails = async (customer: AdminCustomerResponse) => {
 		selected = customer;
-		showImage = true;
-		src = await getDownloadURL(ref(storage, customer.idCardImage));
+		showDetails = true;
 	};
-
-	$: if (!showImage) {
-		src = "";
-		imgLoaded = false;
-	}
 
 	// verify
 
@@ -73,85 +89,74 @@
 				});
 				reload();
 			} catch (err) {
-				console.log(new AppError(err));
+				// @TODO: handle error
+				console.error(new AppError(err));
 			} finally {
 				confirmLoading = false;
 				showConfirm = false;
-				showImage = false;
+				showDetails = false;
 			}
 		}
 	};
 </script>
 
-{#await customers}
-	<Spin class="h-24 w-24" />
-{:then customers}
-	<table>
-		<thead>
-			<tr>
-				<th>Username</th>
-				<th>Fullname</th>
-				<th>Balance</th>
-				<th />
-				<th />
-			</tr>
-		</thead>
-		<tbody>
-			{#each customers as customer}
+{#await data}
+	<div class="h-96 w-full flex items-center justify-center">
+		<Spin class="h-24 w-24 text-rose-500" />
+	</div>
+{:then}
+	<div class="overflow-x-auto">
+		<table class="data-table">
+			<thead>
 				<tr>
-					<td>{customer.user.username}</td>
-					<td>{customer.fullname}</td>
-					<td
-						>{customer.status === "verified"
-							? idrFormat(customer.balance)
-							: "-"}</td
-					>
-					<td>
-						<button class="primary" on:click={() => loadImage(customer)}
-							>View ID Card</button
-						>
-					</td>
-					<td>
-						{#if customer.status === "verified"}
-							<button class="primary w-full" disabled> Verified </button>
-						{:else}
-							<button
-								class="primary w-full"
-								on:click={() => loadImage(customer)}
-							>
-								Verify
-							</button>
-						{/if}
-					</td>
+					<th>Username</th>
+					<th>Fullname</th>
+					<th>Balance</th>
+					<th>Status</th>
+					<th>Created</th>
+					<th />
 				</tr>
-			{/each}
-		</tbody>
-	</table>
+			</thead>
+			<tbody>
+				{#each customers as customer}
+					<tr>
+						<td>{customer.user.username}</td>
+						<td>{customer.fullname}</td>
+						<td class="text-right"
+							>{customer.status === "verified"
+								? idrFormat(customer.balance)
+								: "-"}</td
+						>
+						<td class="text-center">{customer.status}</td>
+						<td class="text-center font-mono">{customer.created}</td>
+						<td class="text-right">
+							<button
+								class="primary w-36"
+								class:variant-outline={customer.status === "verified"}
+								on:click={() => openDetails(customer)}
+							>
+								{customer.status === "verified" ? "View" : "View & Verify"}
+							</button>
+						</td>
+					</tr>
+				{/each}
+			</tbody>
+		</table>
+	</div>
+
+	<div class="w-full my-4 flex justify-end">
+		<Pagination bind:page {pageSize} {totalItems} on:change={reload} />
+	</div>
 
 	<!-- View Image -->
-	<Overlay
-		class="flex flex-col items-center justify-center"
-		bind:isOpen={showImage}
-	>
-		{#if !imgLoaded}
-			<Spin class="text-white h-24 w-24 absolute" />
-		{/if}
-		<div class="w-fit">
-			<img
-				{src}
-				alt="ID Card of {selected?.fullname}"
-				on:load={() => (imgLoaded = true)}
-				class:opacity-0={!imgLoaded}
-				class="max-w-xl max-h-96 transition-opacity"
-				style:min-width="248px"
-			/>
-			{#if imgLoaded && selected?.status === "unverified"}
-				<button class="primary w-full mt-2" on:click={() => confirmVerify()}>
-					Verify
-				</button>
-			{/if}
-		</div>
-	</Overlay>
+	{#if selected}
+		<ViewCustomerDialog
+			bind:isOpen={showDetails}
+			data={selected}
+			admin
+			on:verify={confirmVerify}
+		/>
+	{/if}
 
 	<!-- Confirm verify -->
 	<ConfirmDialog
@@ -166,4 +171,6 @@
 			<div>Once you verify, you cannot unverify.</div>
 		</div>
 	</ConfirmDialog>
+{:catch err}
+	{AppError.getTitle(err)}: {AppError.getMessage(err)}
 {/await}

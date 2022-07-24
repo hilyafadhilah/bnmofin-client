@@ -1,5 +1,6 @@
 @layer base {
-	input {
+	input,
+	select {
 		@apply w-full px-3 py-2
 			rounded-md border-solid border-2 border-slate-300
 			hover:border-teal-500
@@ -10,16 +11,18 @@
 		@apply px-4 py-2
 			border rounded-md
 			active:drop-shadow-md
-			focus:outline-2;
-	}
-
-	button:not(.icon):disabled {
-		@apply active:drop-shadow-none focus:outline-none;
+			focus:outline-2
+			disabled:outline-none
+			disabled:active:drop-shadow-none;
 	}
 
 	button.icon {
-		@apply rounded-full p-2
-			hover:bg-slate-900 hover:bg-opacity-20;
+		@apply bg-transparent rounded-full p-2
+			hover:bg-slate-900 hover:bg-opacity-20
+			focus:outline-2 focus:outline-rose-500
+			disabled:opacity-60 disabled:outline-none
+			disabled:cursor-not-allowed
+			disabled:hover:bg-transparent;
 	}
 
 	a {
@@ -38,11 +41,8 @@
 		@apply bg-rose-500 border-rose-500
 		text-white
 		hover:bg-rose-600
-		focus:outline-teal-800;
-	}
-
-	button.primary[disabled] {
-		@apply bg-rose-300 border-rose-300;
+		focus:outline-teal-800
+		disabled:bg-rose-300 disabled:border-rose-300;
 	}
 
 	button.primary.variant-outline {

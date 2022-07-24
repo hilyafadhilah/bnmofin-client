@@ -8,7 +8,7 @@
 <div
 	class="
 	bg-white rounded-xl drop-shadow-md
-	max-w-xl px-6 py-4 {$$props.class}
+	max-w-xl px-6 py-4 overflow-y-auto {$$props.class}
 "
 >
 	<slot name="header">

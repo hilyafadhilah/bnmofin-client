@@ -68,7 +68,13 @@
 			</div>
 			<nav class="flex flex-col gap-2 px-2">
 				{#each navigationLinks as { label, href }}
-					<a {href} class="text-lg">{label}</a>
+					<a
+						{href}
+						class="text-lg"
+						on:click={() => {
+							isOpen = false;
+						}}>{label}</a
+					>
 				{/each}
 			</nav>
 		</div>

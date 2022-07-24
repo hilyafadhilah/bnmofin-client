@@ -1,0 +1,13 @@
+@layer components {
+	table.data-table {
+		@apply w-full;
+	}
+
+	table.data-table tr {
+		@apply h-14 border-b;
+	}
+
+	table.data-table td {
+		@apply px-2;
+	}
+}
