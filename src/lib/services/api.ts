@@ -58,6 +58,38 @@ async function get<T>(endpoint: string, options?: ApiOptions) {
 	}
 
 	const { data } = await fetch.get<ApiResponse<T>>(endpoint, config);
+	return data.data as T;
+}
+
+export interface ApiBodyOptions<T> extends ApiOptions {
+	method: "post" | "put" | "patch";
+	payload?: T;
+}
+
+async function send<Response, Payload = any>(
+	endpoint: string,
+	options: ApiBodyOptions<Payload> = {
+		method: "post",
+	}
+) {
+	const config: AxiosRequestConfig = {};
+
+	if (options.auth) {
+		config.headers = {
+			Authorization: `Bearer ${options.auth.token}`,
+		};
+	}
+
+	if (options?.query) {
+		config.params = options.query;
+	}
+
+	const { data } = await fetch[options.method]<ApiResponse<Response>>(
+		endpoint,
+		options.payload,
+		config
+	);
+
 	return data.data;
 }
 
@@ -66,4 +98,5 @@ export const api = {
 	getAuthUser,
 	register,
 	get,
+	send,
 };

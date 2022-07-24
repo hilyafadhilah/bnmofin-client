@@ -8,9 +8,13 @@
 
 	button:not(.icon) {
 		@apply px-4 py-2
-			rounded-md
+			border rounded-md
 			active:drop-shadow-md
 			focus:outline-2;
+	}
+
+	button:not(.icon):disabled {
+		@apply active:drop-shadow-none focus:outline-none;
 	}
 
 	button.icon {
@@ -31,9 +35,19 @@
 
 @layer components {
 	button.primary {
-		@apply bg-rose-500
-			text-white
-			hover:bg-rose-600
-			focus:outline-teal-800;
+		@apply bg-rose-500 border-rose-500
+		text-white
+		hover:bg-rose-600
+		focus:outline-teal-800;
+	}
+
+	button.primary[disabled] {
+		@apply bg-rose-300 border-rose-300;
+	}
+
+	button.primary.variant-outline {
+		@apply bg-transparent
+		text-rose-500 border-rose-500
+		hover:bg-rose-300 hover:bg-opacity-30;
 	}
 }

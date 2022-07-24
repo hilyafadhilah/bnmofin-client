@@ -4,6 +4,7 @@
 	import Drawer from "$lib/components/overlay/Drawer.svelte";
 	import bnmo from "$root/assets/images/bnmo.png";
 	import { browser } from "$app/env";
+	import Overlay from "../overlay/Overlay.svelte";
 
 	type NavigationLink = { label: string; href: string };
 	export let navigationLinks = [] as NavigationLink[];
@@ -52,22 +53,24 @@
 	</div>
 </header>
 
-<Drawer bind:isOpen from="right" {duration}>
-	<div class="flex flex-col p-2">
-		<div class="self-end mb-2">
-			<button
-				class="icon text-teal-900"
-				on:click={() => {
-					isOpen = false;
-				}}
-			>
-				<Close />
-			</button>
+<Overlay bind:isOpen class="w-screen h-screen" {duration}>
+	<Drawer bind:isOpen from="right" {duration}>
+		<div class="flex flex-col p-2">
+			<div class="self-end mb-2">
+				<button
+					class="icon text-teal-900"
+					on:click={() => {
+						isOpen = false;
+					}}
+				>
+					<Close />
+				</button>
+			</div>
+			<nav class="flex flex-col gap-2 px-2">
+				{#each navigationLinks as { label, href }}
+					<a {href} class="text-lg">{label}</a>
+				{/each}
+			</nav>
 		</div>
-		<nav class="flex flex-col gap-2 px-2">
-			{#each navigationLinks as { label, href }}
-				<a {href} class="text-lg">{label}</a>
-			{/each}
-		</nav>
-	</div>
-</Drawer>
+	</Drawer>
+</Overlay>

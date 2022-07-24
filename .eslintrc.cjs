@@ -32,5 +32,6 @@ module.exports = {
 		"no-tabs": "off",
 		"@typescript-eslint/indent": ["error", "tab"],
 		"no-console": "off",
+		"@typescript-eslint/no-explicit-any": "off",
 	},
 };
