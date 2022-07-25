@@ -10,4 +10,8 @@
 	table.data-table td {
 		@apply px-2;
 	}
+
+	table.data-table thead tr {
+		@apply border-gray-300;
+	}
 }

@@ -19,6 +19,10 @@
 		pages = [...Array(totalPages).keys()].map((i) => i + 1);
 	}
 
+	$: if (totalItems === 0) {
+		currentItem = 0;
+	}
+
 	const dispatch = createEventDispatcher();
 </script>
 
@@ -41,6 +45,7 @@
 		<div class="mr-2">Page:</div>
 		<select
 			style:min-width="58px"
+			disabled={totalItems === 0}
 			bind:value={page}
 			on:change={() => dispatch("change", page)}
 		>
@@ -52,7 +57,7 @@
 	<div class="flex items-center ml-2 gap-1">
 		<button
 			class="icon"
-			disabled={page === 1}
+			disabled={page === 1 || totalItems === 0}
 			on:click={() => {
 				page--;
 				dispatch("change", page);
@@ -62,7 +67,7 @@
 		</button>
 		<button
 			class="icon"
-			disabled={page === totalPages}
+			disabled={page === totalPages || totalItems === 0}
 			on:click={() => {
 				page++;
 				dispatch("change", page);

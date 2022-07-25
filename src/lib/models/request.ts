@@ -2,7 +2,7 @@ export interface AdminRequestResponse {
 	id: number;
 	customerId: number;
 	amount: number;
-	status: "awaiting" | "accepted" | "declined";
+	status: RequestStatus;
 	created: string;
 	customer: {
 		fullname: string;
@@ -11,6 +11,15 @@ export interface AdminRequestResponse {
 		};
 	};
 }
+
+export interface CustomerRequestResponse {
+	id: number;
+	amount: number;
+	status: RequestStatus;
+	created: string;
+}
+
+export type RequestStatus = "awaiting" | "accepted" | "declined";
 
 export type RequestResponseStatus = "accepted" | "declined";
 

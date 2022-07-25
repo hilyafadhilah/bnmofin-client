@@ -28,6 +28,7 @@
 <script lang="ts">
 	import { session } from "$app/stores";
 	import AdminRequestsPage from "$pages/admin/AdminRequestsPage.svelte";
+	import CustomerRequestsPage from "$root/lib/pages/customer/CustomerRequestsPage.svelte";
 	import type { ApiCollectionResponse } from "$models/api";
 
 	export let data: ApiCollectionResponse<any>;
@@ -35,4 +36,6 @@
 
 {#if $session.auth?.user.role === AuthRole.Admin}
 	<AdminRequestsPage {fetchData} {data} />
+{:else}
+	<CustomerRequestsPage {fetchData} {data} />
 {/if}
