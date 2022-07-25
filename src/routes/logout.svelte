@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-	import { toast } from "$lib/stores/toast";
+	import { toast } from "$stores/toast";
 
 	import type { Load } from "@sveltejs/kit";
 	import { remove as removeCookie } from "es-cookie";

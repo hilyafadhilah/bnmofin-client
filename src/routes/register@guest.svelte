@@ -9,11 +9,11 @@
 </script>
 
 <script lang="ts">
-	import FormItem from "$lib/components/input/FormItem.svelte";
-	import { getReadableFileSize, kilobyte } from "$lib/utils/file";
-	import { api } from "$lib/services/api";
-	import { AppError } from "$lib/models/error";
-	import SpinnerOverlay from "$lib/components/overlay/SpinnerOverlay.svelte";
+	import FormItem from "$components/input/FormItem.svelte";
+	import { getReadableFileSize, kilobyte } from "$utils/file";
+	import { api } from "$services/api";
+	import { AppError } from "$models/error";
+	import SpinnerOverlay from "$components/overlay/SpinnerOverlay.svelte";
 
 	let username = "";
 	let password = "";

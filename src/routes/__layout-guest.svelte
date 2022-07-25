@@ -1,12 +1,12 @@
 <script lang="ts">
 	import "$root/app.css";
-	import Head from "$lib/components/Head.svelte";
-	import CompactHeader from "$lib/components/layout/CompactHeader.svelte";
+	import Head from "$components/Head.svelte";
+	import CompactHeader from "$components/layout/CompactHeader.svelte";
 	import { browser } from "$app/env";
 	import { goto } from "$app/navigation";
 	import { page, session } from "$app/stores";
-	import ToastContainer from "$lib/components/feedback/ToastContainer.svelte";
-	import { toast } from "$lib/stores/toast";
+	import ToastContainer from "$components/feedback/ToastContainer.svelte";
+	import { toast } from "$stores/toast";
 
 	$: if (browser && $session.auth) {
 		goto("/");

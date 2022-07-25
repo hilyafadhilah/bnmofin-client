@@ -1,18 +1,21 @@
 <script lang="ts" context="module">
-	import { api } from "$lib/services/api";
-	import { toast } from "$lib/stores/toast";
+	import { api } from "$services/api";
+	import { toast } from "$stores/toast";
 
 	import type { Load } from "@sveltejs/kit";
-	import type { AdminCustomerResponse } from "$lib/models/customer";
+	import type { AdminCustomerResponse } from "$models/customer";
+	import type { Auth } from "$models/auth";
+
+	function fetchData(auth?: Auth, page?: number) {
+		return api.getMany<AdminCustomerResponse[]>("/customer", {
+			auth,
+			page,
+			pageSize: 25,
+		});
+	}
 
 	export const load: Load = async ({ session }) => {
-		const data = await api
-			.getMany<AdminCustomerResponse[]>("/customer", {
-				auth: session.auth,
-				page: 1,
-				pageSize: 25,
-			})
-			.catch(toast.forwardError());
+		const data = await fetchData(session.auth).catch(toast.forwardError());
 
 		return {
 			stuff: { title: "Customers" },
@@ -24,13 +27,13 @@
 </script>
 
 <script lang="ts">
-	import ConfirmDialog from "$lib/components/overlay/ConfirmDialog.svelte";
+	import ConfirmDialog from "$components/overlay/ConfirmDialog.svelte";
 	import { session } from "$app/stores";
-	import { idrFormat } from "$lib/utils/data";
-	import ViewCustomerDialog from "$lib/components/view/ViewCustomerDialog.svelte";
-	import type { ApiResponse } from "$lib/models/api";
-	import Pagination from "$lib/components/data/Pagination.svelte";
-	import SpinnerOverlay from "$lib/components/overlay/SpinnerOverlay.svelte";
+	import { idrFormat } from "$utils/data";
+	import ViewCustomerDialog from "$components/view/ViewCustomerDialog.svelte";
+	import type { ApiResponse } from "$models/api";
+	import Pagination from "$components/data/Pagination.svelte";
+	import SpinnerOverlay from "$components/overlay/SpinnerOverlay.svelte";
 
 	export let data: ApiResponse<AdminCustomerResponse[]> | null;
 	let customers: AdminCustomerResponse[];
@@ -48,13 +51,7 @@
 
 	const reload = () => {
 		data = null;
-
-		api
-			.getMany<AdminCustomerResponse[]>("/request", {
-				auth: $session.auth,
-				page,
-				pageSize,
-			})
+		fetchData($session.auth, page)
 			.then((d) => (data = d))
 			.catch(toast.catchError());
 	};

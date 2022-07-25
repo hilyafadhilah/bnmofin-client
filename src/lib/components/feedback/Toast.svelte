@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fastSlide } from "$lib/transitions/fast-slide";
+	import { fastSlide } from "$transitions/fast-slide";
 	import type { ComponentType } from "svelte";
 
 	export let message: string;

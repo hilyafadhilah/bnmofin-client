@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Burger from "$lib/components/icons/Burger.svelte";
-	import Close from "$lib/components/icons/Close.svelte";
-	import Drawer from "$lib/components/overlay/Drawer.svelte";
+	import Burger from "$components/icons/Burger.svelte";
+	import Close from "$components/icons/Close.svelte";
+	import Drawer from "$components/overlay/Drawer.svelte";
 	import bnmo from "$root/assets/images/bnmo.png";
 	import { browser } from "$app/env";
 	import Overlay from "../overlay/Overlay.svelte";

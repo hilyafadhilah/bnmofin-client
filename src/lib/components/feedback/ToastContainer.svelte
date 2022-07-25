@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ToastOptions } from "$lib/stores/toast";
+	import type { ToastOptions } from "$stores/toast";
 	import Toast from "./Toast.svelte";
 
 	export let messages: ToastOptions[];

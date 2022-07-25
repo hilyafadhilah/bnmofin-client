@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getStorage, ref, getDownloadURL } from "firebase/storage";
-	import type { AdminCustomerResponse } from "$lib/models/customer";
-	import { idrFormat } from "$lib/utils/data";
+	import type { AdminCustomerResponse } from "$models/customer";
+	import { idrFormat } from "$utils/data";
 	import Image from "../data/Image.svelte";
 	import Spin from "../icons/Spin.svelte";
 

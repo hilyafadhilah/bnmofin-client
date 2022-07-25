@@ -1,22 +1,25 @@
 <script lang="ts" context="module">
-	import { api } from "$lib/services/api";
-	import { toast } from "$lib/stores/toast";
+	import { api } from "$services/api";
+	import { toast } from "$stores/toast";
 
 	import type {
 		RespondRequestPayload,
 		AdminRequestResponse,
 		RequestResponseStatus,
-	} from "$lib/models/request";
+	} from "$models/request";
 	import type { Load } from "@sveltejs/kit";
+	import type { Auth } from "$models/auth";
+
+	function fetchData(auth?: Auth, page?: number) {
+		return api.getMany<AdminRequestResponse[]>("/request", {
+			auth,
+			page,
+			pageSize: 25,
+		});
+	}
 
 	export const load: Load = async ({ session }) => {
-		const data = await api
-			.getMany<AdminRequestResponse[]>("/request", {
-				auth: session.auth,
-				page: 1,
-				pageSize: 25,
-			})
-			.catch(toast.forwardError());
+		const data = await fetchData(session.auth).catch(toast.forwardError());
 
 		return {
 			stuff: { title: "Requests" },
@@ -28,12 +31,12 @@
 </script>
 
 <script lang="ts">
-	import ConfirmDialog from "$lib/components/overlay/ConfirmDialog.svelte";
-	import Pagination from "$lib/components/data/Pagination.svelte";
+	import ConfirmDialog from "$components/overlay/ConfirmDialog.svelte";
+	import Pagination from "$components/data/Pagination.svelte";
 	import { session } from "$app/stores";
-	import { idrFormat } from "$lib/utils/data";
-	import type { ApiResponse } from "$lib/models/api";
-	import SpinnerOverlay from "$lib/components/overlay/SpinnerOverlay.svelte";
+	import { idrFormat } from "$utils/data";
+	import type { ApiResponse } from "$models/api";
+	import SpinnerOverlay from "$components/overlay/SpinnerOverlay.svelte";
 
 	export let data: ApiResponse<AdminRequestResponse[]> | null;
 	let requests: AdminRequestResponse[];
@@ -51,13 +54,7 @@
 
 	const reload = () => {
 		data = null;
-
-		api
-			.getMany<AdminRequestResponse[]>("/request", {
-				auth: $session.auth,
-				page,
-				pageSize,
-			})
+		fetchData($session.auth, page)
 			.then((d) => (data = d))
 			.catch(toast.catchError());
 	};

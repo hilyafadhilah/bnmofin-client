@@ -9,13 +9,13 @@
 </script>
 
 <script lang="ts">
-	import FormItem from "$lib/components/input/FormItem.svelte";
-	import { AppError } from "$lib/models/error";
-	import SpinnerOverlay from "$lib/components/overlay/SpinnerOverlay.svelte";
+	import FormItem from "$components/input/FormItem.svelte";
+	import { AppError } from "$models/error";
+	import SpinnerOverlay from "$components/overlay/SpinnerOverlay.svelte";
 	import { session } from "$app/stores";
-	import { api } from "$lib/services/api";
+	import { api } from "$services/api";
 	import { set as setCookie } from "es-cookie";
-	import { toast } from "$lib/stores/toast";
+	import { toast } from "$stores/toast";
 
 	let username = "";
 	let password = "";

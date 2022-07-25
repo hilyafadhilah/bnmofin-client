@@ -11,8 +11,8 @@
 </script>
 
 <script lang="ts">
-	import { AppError } from "$lib/models/error";
-	import { isTokenError } from "$lib/utils/error";
+	import { AppError } from "$models/error";
+	import { isTokenError } from "$utils/error";
 	import { page } from "$app/stores";
 </script>
 

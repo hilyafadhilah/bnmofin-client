@@ -11,7 +11,7 @@ declare namespace App {
 	// interface Platform {}
 
 	interface Session {
-		auth?: import("$lib/models/auth").Auth;
+		auth?: import("$models/auth").Auth;
 	}
 
 	interface Stuff {

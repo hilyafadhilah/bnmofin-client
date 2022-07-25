@@ -5,7 +5,7 @@
 -->
 <script lang="ts" context="module">
 	import type { Load } from "@sveltejs/kit";
-	import { firebase } from "$lib/services/firebase";
+	import { firebase } from "$services/firebase";
 
 	export const load: Load = ({ session, error }) => {
 		if (!session.auth && !error) {
@@ -23,13 +23,13 @@
 
 <script lang="ts">
 	import "$root/app.css";
-	import Head from "$lib/components/Head.svelte";
-	import Header from "$lib/components/layout/Header.svelte";
+	import Head from "$components/Head.svelte";
+	import Header from "$components/layout/Header.svelte";
 	import { browser } from "$app/env";
 	import { goto } from "$app/navigation";
 	import { page, session } from "$app/stores";
-	import ToastContainer from "$lib/components/feedback/ToastContainer.svelte";
-	import { toast } from "$lib/stores/toast";
+	import ToastContainer from "$components/feedback/ToastContainer.svelte";
+	import { toast } from "$stores/toast";
 
 	$: if (browser && !$session.auth && !$page.error) {
 		goto("/login");

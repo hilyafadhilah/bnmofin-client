@@ -12,7 +12,13 @@
 		"paths": {
 			"$root/*": ["./src/*"],
 			"$lib": ["./src/lib"],
-			"$lib/*": ["./src/lib/*"]
+			"$lib/*": ["./src/lib/*"],
+			"$components/*": ["./src/lib/components/*"],
+			"$models/*": ["./src/lib/models/*"],
+			"$services/*": ["./src/lib/services/*"],
+			"$stores/*": ["./src/lib/stores/*"],
+			"$transitions/*": ["./src/lib/transitions/*"],
+			"$utils/*": ["./src/lib/utils/*"]
 		}
 	}
 }

@@ -1,6 +1,6 @@
 import axios, { type AxiosRequestConfig } from "axios";
-import type { ApiResponse } from "$lib/models/api";
-import type { Auth, AuthUser, LoginPayload } from "$lib/models/auth";
+import type { ApiResponse } from "$models/api";
+import type { Auth, AuthUser, LoginPayload } from "$models/auth";
 import type { RegisterPayload } from "../models/customer";
 
 const fetch = axios.create({

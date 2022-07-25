@@ -18,6 +18,12 @@ const config = {
 		adapter: adapter(),
 		alias: {
 			$root: path.resolve("src"),
+			$components: path.resolve("src/lib/components"),
+			$models: path.resolve("src/lib/models"),
+			$services: path.resolve("src/lib/services"),
+			$stores: path.resolve("src/lib/stores"),
+			$transitions: path.resolve("src/lib/transitions"),
+			$utils: path.resolve("src/lib/utils"),
 		},
 	},
 };
