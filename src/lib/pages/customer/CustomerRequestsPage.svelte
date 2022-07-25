@@ -2,13 +2,19 @@
 	import { session } from "$app/stores";
 	import { idrFormat } from "$utils/data";
 	import { toast } from "$stores/toast";
+	import { api } from "$root/lib/services/api";
 
 	import Pagination from "$components/data/Pagination.svelte";
 	import SpinnerOverlay from "$components/overlay/SpinnerOverlay.svelte";
+	import NewRequestDialog from "$root/lib/components/view/NewRequestDialog.svelte";
 
 	import type { ApiResponse } from "$models/api";
-	import type {CustomerRequestResponse} from "$models/request";
+	import type {
+		CustomerRequestResponse,
+		NewRequestPayload,
+	} from "$models/request";
 	import type { Auth } from "$models/auth";
+	import type { CurrenciesResponse } from "$root/lib/models/money";
 
 	export let fetchData: (
 		auth?: Auth,
@@ -37,7 +43,78 @@
 
 	let loading: boolean;
 	$: loading = !data;
+
+	// new request
+
+	let currencies: CurrenciesResponse = {
+		IDR: "Indonesian Rupiah",
+	};
+
+	api
+		.get<CurrenciesResponse>("/currency/symbols")
+		.then((data) => (currencies = data))
+		.catch(toast.catchError());
+
+	let isRequesting = false;
+	let isSubmitting = false;
+
+	let amount = 100.0;
+	let currency = "IDR";
+
+	const submitRequest = async (payload: NewRequestPayload) => {
+		isSubmitting = true;
+
+		try {
+			const request = await api.send<
+				NewRequestPayload,
+				CustomerRequestResponse
+			>("/request", {
+				method: "post",
+				payload,
+				auth: $session.auth,
+			});
+
+			toast.success({
+				title: "Successful",
+				message: `Successfully requested ${payload.money.amount} ${payload.money.currency}.`,
+				duration: 5000,
+			});
+
+			if (requests.length === pageSize) {
+				requests.pop();
+			}
+
+			requests = [request, ...requests];
+		} catch (error) {
+			toast.error(error);
+		} finally {
+			isSubmitting = false;
+			isRequesting = false;
+		}
+	};
 </script>
+
+<div
+	class="flex flex-wrap gap-2 justify-end my-2 pb-2 border-b border-slate-200"
+>
+	<div class="flex-grow">
+		<h2 class="font-serif">Your Requests</h2>
+	</div>
+	<div>
+		<button type="button" class="primary" on:click={() => (isRequesting = true)}
+			>Issue New Request</button
+		>
+	</div>
+</div>
+
+<NewRequestDialog
+	bind:isOpen={isRequesting}
+	bind:loading={isSubmitting}
+	bind:amount
+	bind:currency
+	{currencies}
+	on:submit={(e) => submitRequest(e.detail)}
+/>
 
 <div class="w-full overflow-x-auto rounded-md" class:overflow-hidden={loading}>
 	<SpinnerOverlay {loading} />
@@ -61,15 +138,6 @@
 	</table>
 </div>
 
-<style lang="postcss">
-	tr.accepted {
-		@apply bg-emerald-100 border-emerald-300;
-	}
-	tr.declined {
-		@apply bg-red-100 border-red-300;
-	}
-</style>
-
 <div class="w-full my-4 flex justify-end">
 	<Pagination
 		bind:page
@@ -79,3 +147,12 @@
 		disabled={loading}
 	/>
 </div>
+
+<style lang="postcss">
+	tr.accepted {
+		@apply bg-emerald-100 border-emerald-300;
+	}
+	tr.declined {
+		@apply bg-red-100 border-red-300;
+	}
+</style>

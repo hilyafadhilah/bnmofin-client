@@ -125,7 +125,7 @@ async function send<Payload = any, Response = any>(
 		config
 	);
 
-	return data.data;
+	return data.data as Response;
 }
 
 export const api = {

@@ -1,3 +1,5 @@
+import type { Money } from "./money";
+
 export interface AdminRequestResponse {
 	id: number;
 	customerId: number;
@@ -24,3 +26,7 @@ export type RequestStatus = "awaiting" | "accepted" | "declined";
 export type RequestResponseStatus = "accepted" | "declined";
 
 export type RespondRequestPayload = { status: RequestResponseStatus };
+
+export interface NewRequestPayload {
+	money: Money;
+}
