@@ -1,10 +1,11 @@
-import { remove, set } from "es-cookie";
+import { get, remove, set } from "es-cookie";
 import type { LoginPayload, Auth } from "$models/auth";
 import { toast } from "$stores/toast";
 import { api } from "$services/api";
 import type { Writable } from "svelte/store";
 import { SessionExpiredError } from "../models/error";
 import { isTokenError } from "../utils/error";
+import { browser } from "$app/env";
 
 const tokenCookieKey = import.meta.env.VITE_SESSION_COOKIE ?? "token";
 
@@ -31,6 +32,13 @@ async function refresh(
 	const token = session.auth?.token;
 	if (!token) {
 		return;
+	}
+
+	if (browser) {
+		const cookie = get(tokenCookieKey);
+		if (!cookie || token !== cookie) {
+			throw new SessionExpiredError();
+		}
 	}
 
 	try {

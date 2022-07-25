@@ -26,7 +26,7 @@
 
 		{#if isTokenError($page.error)}
 			<div>
-				<a href="/login" class="text-rose-500"> Click here to log in again. </a>
+				<a href="/logout" class="text-rose-500"> Click here to log in again. </a>
 			</div>
 		{/if}
 	</div>
