@@ -44,3 +44,12 @@ export class UnauthorizedError extends AppError {
 		});
 	}
 }
+
+export class SessionExpiredError extends AppError {
+	constructor() {
+		super({
+			title: "Session Expired",
+			message: "Session has expired, please log in again.",
+		});
+	}
+}

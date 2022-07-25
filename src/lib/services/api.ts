@@ -13,7 +13,7 @@ async function login(payload: LoginPayload) {
 	return data.data;
 }
 
-async function getAuth(token: string) {
+async function getCurrentUser(token: string) {
 	const { data } = await fetch.get<ApiResponse<CurrentUser>>("/auth", {
 		headers: {
 			Authorization: `Bearer ${token}`,
@@ -130,7 +130,7 @@ async function send<Payload = any, Response = any>(
 
 export const api = {
 	login,
-	getAuth,
+	getCurrentUser,
 	register,
 	get,
 	getMany,

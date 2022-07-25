@@ -26,11 +26,12 @@
 	import Head from "$components/Head.svelte";
 	import Header from "$components/layout/Header.svelte";
 	import { browser } from "$app/env";
-	import { goto } from "$app/navigation";
+	import { afterNavigate, goto } from "$app/navigation";
 	import { page, session } from "$app/stores";
 	import ToastContainer from "$components/feedback/ToastContainer.svelte";
 	import { toast } from "$stores/toast";
 	import { AuthRole } from "$models/auth";
+	import { sessionManager } from "$services/session-manager";
 
 	$: if (browser && !$session.auth && !$page.error) {
 		goto("/login");
@@ -43,10 +44,28 @@
 		{ href: "/logout", label: "Logout" },
 	];
 
-	$: if ($session.auth?.user.role === AuthRole.Admin) {
+	if ($session.auth?.user.role === AuthRole.Admin) {
 		navigationLinks.splice(1, 0, { href: "/customers", label: "Customers" });
 		navigationLinks = navigationLinks;
 	}
+
+	afterNavigate(() => {
+		sessionManager.refresh(session, $session).catch(toast.forwardError);
+	});
+
+	afterNavigate(({ from, to }) => {
+		if (from?.host === to.host && from.pathname === "/login") {
+			toast.success({
+				title: `Welcome ${$session.auth?.user.username}!`,
+				message: "You have successfully logged in.",
+			});
+		} else if (from?.host !== to.host) {
+			toast.success({
+				title: `Welcome back, ${$session.auth?.user.username}`,
+				message: "You are logged in.",
+			});
+		}
+	});
 </script>
 
 <Head title={$page.stuff.title} />
