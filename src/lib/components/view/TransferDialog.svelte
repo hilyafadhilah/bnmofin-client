@@ -14,19 +14,21 @@
 
 	export let balance: number | undefined = undefined;
 
-	export let receiver = "";
-	export let amount = 0.0;
-	export let currency = "IDR";
+	export let value: TransferPayload = {
+		username: "",
+		money: {
+			amount: 0.0,
+			currency: "",
+		},
+	};
+
 	export let currencies: CurrenciesResponse = {};
 
 	const dispatch = createEventDispatcher<{ submit: TransferPayload }>();
 
 	const submitHandler = (e: SubmitEvent) => {
 		e.preventDefault();
-		dispatch("submit", {
-			username: receiver,
-			money: { amount, currency },
-		});
+		dispatch("submit", value);
 	};
 </script>
 
@@ -54,11 +56,15 @@
 						type="text"
 						placeholder="Receiver's username"
 						required
-						bind:value={receiver}
+						bind:value={value.username}
 					/>
 				</FormItem>
 				<FormItem id="currency" label="Currency">
-					<select id="currency" bind:value={currency} class="font-mono">
+					<select
+						id="currency"
+						bind:value={value.money.currency}
+						class="font-mono"
+					>
 						{#each Object.keys(currencies) as symbol}
 							<option value={symbol}>
 								{symbol} - {currencies[symbol]}
@@ -74,7 +80,7 @@
 						min="0"
 						step=".01"
 						required
-						bind:value={amount}
+						bind:value={value.money.amount}
 					/>
 					<div class="text-sm text-slate-600 self-end">Can be decimal.</div>
 				</FormItem>

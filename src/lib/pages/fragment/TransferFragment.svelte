@@ -38,73 +38,85 @@
 	let showConfirm = false;
 	let loading = false;
 
-	let payload: TransferPayload | undefined;
+	let payload: TransferPayload;
 
-	const confirm = (data: TransferPayload) => {
-		payload = data;
+	const reset = () => {
+		payload = {
+			username: "",
+			money: {
+				currency: "IDR",
+				amount: 100000,
+			},
+		};
+	};
+
+	reset();
+
+	const confirm = () => {
 		showConfirm = true;
 	};
 
 	// action!
 
 	const submitTransfer = async () => {
-		if (payload) {
-			loading = true;
+		loading = true;
 
-			try {
-				const transaction = await api.send<TransferPayload, TransferResponse>(
-					"/transfer",
-					{
-						method: "post",
-						payload,
-						auth: $session.auth,
-					}
-				);
-
-				toast.success({
-					title: "Successful",
-					message: `Successfully sent ${moneyFormat(
-						payload.money.amount,
-						payload.money.currency
-					)} to ${payload.username}.`,
-					duration: 5000,
-				});
-
-				isOpen = false;
-
-				if (transactions && pageSize) {
-					if (transactions.length === pageSize) {
-						transactions.pop();
-					}
+		try {
+			const transaction = await api.send<TransferPayload, TransferResponse>(
+				"/transfer",
+				{
+					method: "post",
+					payload,
+					auth: $session.auth,
 				}
+			);
 
-				if (transactions) {
-					transactions.splice(0, 0, transaction);
-					transactions = transactions;
+			toast.success({
+				title: "Successful",
+				message: `Successfully sent ${moneyFormat(
+					payload.money.amount,
+					payload.money.currency
+				)} to ${payload.username}.`,
+				duration: 5000,
+			});
+
+			isOpen = false;
+
+			if (transactions && pageSize) {
+				if (transactions.length === pageSize) {
+					transactions.pop();
 				}
-
-				session.update((value) => {
-					if (value.auth?.customer) {
-						value.auth.customer.balance = transaction.sender.balance;
-					}
-					return value;
-				});
-			} catch (error) {
-				toast.error(error);
-			} finally {
-				loading = false;
-				showConfirm = false;
 			}
+
+			if (transactions) {
+				transactions.splice(0, 0, transaction);
+				transactions = transactions;
+			}
+
+			session.update((value) => {
+				if (value.auth?.customer) {
+					value.auth.customer.balance = transaction.sender.balance;
+				}
+				return value;
+			});
+
+			reset();
+		} catch (error) {
+			toast.error(error);
+		} finally {
+			loading = false;
+			showConfirm = false;
 		}
 	};
 </script>
 
 <TransferDialog
+	bind:value={payload}
 	bind:isOpen
 	bind:loading
 	{currencies}
 	balance={$session.auth?.customer?.balance}
-	on:submit={(e) => confirm(e.detail)}
+	on:submit={() => confirm()}
 />
 
 <ConfirmDialog

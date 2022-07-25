@@ -62,10 +62,20 @@
 	let isRequesting = false;
 	let isSubmitting = false;
 
-	let amount = 100.0;
-	let currency = "IDR";
+	let payload: NewRequestPayload;
 
-	const submitRequest = async (payload: NewRequestPayload) => {
+	const reset = () => {
+		payload = {
+			money: {
+				amount: 100000.0,
+				currency: "IDR",
+			},
+		};
+	};
+
+	reset();
+
+	const submitRequest = async () => {
 		isSubmitting = true;
 
 		try {
@@ -93,6 +103,8 @@
 
 			requests.splice(0, 0, request);
 			requests = requests;
+
+			reset();
 		} catch (error) {
 			toast.error(error);
 		} finally {
@@ -121,10 +133,9 @@
 <NewRequestDialog
 	bind:isOpen={isRequesting}
 	bind:loading={isSubmitting}
-	bind:amount
-	bind:currency
+	bind:value={payload}
 	{currencies}
-	on:submit={(e) => submitRequest(e.detail)}
+	on:submit={() => submitRequest()}
 />
 
 <div class="w-full overflow-x-auto rounded-md" class:overflow-hidden={loading}>

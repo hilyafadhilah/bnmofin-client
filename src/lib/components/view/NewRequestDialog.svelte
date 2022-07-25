@@ -11,15 +11,20 @@
 	export let isOpen = false;
 	export let loading = false;
 
-	export let amount = 0.0;
-	export let currency = "IDR";
+	export let value: NewRequestPayload = {
+		money: {
+			amount: 0.0,
+			currency: "IDR",
+		},
+	};
+
 	export let currencies: CurrenciesResponse = {};
 
 	const dispatch = createEventDispatcher<{ submit: NewRequestPayload }>();
 
 	const submitHandler = (e: SubmitEvent) => {
 		e.preventDefault();
-		dispatch("submit", { money: { amount, currency } });
+		dispatch("submit", value);
 	};
 </script>
 
@@ -31,7 +36,11 @@
 		<form id="issueRequest" on:submit={submitHandler}>
 			<div class="px-2 my-8 mb-12">
 				<FormItem id="currency" label="Currency">
-					<select id="currency" bind:value={currency} class="font-mono">
+					<select
+						id="currency"
+						bind:value={value.money.currency}
+						class="font-mono"
+					>
 						{#each Object.keys(currencies) as symbol}
 							<option value={symbol}>
 								{symbol} - {currencies[symbol]}
@@ -45,7 +54,7 @@
 						type="number"
 						pattern={`^\\d*(\\.\\d{0,2})?$`}
 						step=".01"
-						bind:value={amount}
+						bind:value={value.money.amount}
 					/>
 					<div class="text-sm text-slate-600 self-end">
 						Can be decimal, can be negative.
