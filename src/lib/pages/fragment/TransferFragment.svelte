@@ -84,8 +84,8 @@
 				}
 
 				session.update((value) => {
-					if (value.customer) {
-						value.customer.balance = transaction.sender.balance;
+					if (value.auth?.customer) {
+						value.auth.customer.balance = transaction.sender.balance;
 					}
 					return value;
 				});
@@ -103,7 +103,7 @@
 	bind:isOpen
 	bind:loading
 	{currencies}
-	balance={$session.customer?.balance}
+	balance={$session.auth?.customer?.balance}
 	on:submit={(e) => confirm(e.detail)}
 />
 

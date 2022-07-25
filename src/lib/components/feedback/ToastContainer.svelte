@@ -1,8 +1,13 @@
 <script lang="ts">
-	import type { ToastOptions } from "$stores/toast";
+	import type { ToastProps } from "$stores/toast";
 	import Toast from "./Toast.svelte";
 
-	export let messages: ToastOptions[];
+	export let toasts: ToastProps[] = [];
+	let visible: ToastProps[] = [];
+
+	setInterval(() => {
+		visible = toasts.filter(({ expire }) => expire >= new Date());
+	}, 100);
 </script>
 
 <div
@@ -14,13 +19,13 @@
 "
 	style:z-index="999"
 >
-	{#each messages as message (message)}
+	{#each visible as toast}
 		<Toast
-			title={message.title}
-			message={message.message}
-			type={message.type}
-			variant={message.variant}
-			icon={message.icon}
+			title={toast.title}
+			message={toast.message}
+			type={toast.type}
+			variant={toast.variant}
+			bind:expire={toast.expire}
 		/>
 	{/each}
 </div>

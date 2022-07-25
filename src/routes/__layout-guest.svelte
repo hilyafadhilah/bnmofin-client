@@ -42,4 +42,4 @@
 	</main>
 </div>
 
-<ToastContainer messages={$toast} />
+<ToastContainer toasts={$toast} />

@@ -13,8 +13,7 @@
 	import { AppError } from "$models/error";
 	import SpinnerOverlay from "$components/overlay/SpinnerOverlay.svelte";
 	import { session } from "$app/stores";
-	import { api } from "$services/api";
-	import { set as setCookie } from "es-cookie";
+	import { sessionManager } from "$services/session-manager";
 
 	let username = "";
 	let password = "";
@@ -29,12 +28,7 @@
 			loading = true;
 			error = null;
 
-			const auth = await api.login({ username, password });
-			session.update((value) => {
-				value.auth = auth;
-				return value;
-			});
-			setCookie("token", auth.token);
+			await sessionManager.login(session, { username, password });
 		} catch (err) {
 			error = new AppError(err);
 		} finally {

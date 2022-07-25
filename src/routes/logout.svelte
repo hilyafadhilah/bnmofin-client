@@ -1,10 +1,10 @@
 <script lang="ts" context="module">
+	import { sessionManager } from "$services/session-manager";
+
 	import type { Load } from "@sveltejs/kit";
-	import { remove as removeCookie } from "es-cookie";
 
 	export const load: Load = ({ session }) => {
-		delete session.auth;
-		removeCookie("token");
+		sessionManager.logout(session);
 
 		return {
 			status: 307,

@@ -1,6 +1,6 @@
 import type { GetSession, Handle } from "@sveltejs/kit";
 import { parse } from "es-cookie";
-import { api } from "./lib/services/api";
+import { sessionManager } from "./lib/services/session-manager";
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const cookieString = event.request.headers.get("cookie");
@@ -18,18 +18,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 };
 
 export const getSession: GetSession = async ({ locals }) => {
-	const session: App.Session = {};
-
-	if (locals.cookie.token) {
-		try {
-			session.auth = {
-				token: locals.cookie.token,
-				user: await api.getAuthUser(locals.cookie.token),
-			};
-		} catch {
-			// session = {}
-		}
-	}
-
+	const session = await sessionManager.fetchData(
+		locals.cookie[sessionManager.tokenCookieKey]
+	);
 	return session;
 };

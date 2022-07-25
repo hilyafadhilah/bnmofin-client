@@ -13,25 +13,43 @@ export interface ToastStyleOptions {
 }
 
 export interface ToastOptions extends ToastMessage, ToastStyleOptions {
-	type?: "success" | "error";
+	type?: "primary" | "success" | "error";
 	icon?: ComponentType;
 }
 
+export interface ToastProps extends ToastOptions {
+	expire: Date;
+}
+
+const defaults = {
+	type: "primary" as const,
+	variant: "solid" as const,
+	duration: 3000,
+};
+
 function createToast() {
-	const { subscribe, update } = writable<ToastOptions[]>([]);
+	const { subscribe, update } = writable<ToastProps[]>([]);
 
 	function push(options: ToastOptions) {
-		update((value) => {
-			value.push(options);
-			return value;
-		});
+		const expire = new Date();
+		expire.setMilliseconds(
+			expire.getMilliseconds() + (options.duration ?? defaults.duration)
+		);
 
-		setTimeout(() => {
-			update((value) => {
-				value.splice(value.indexOf(options), 1);
-				return value;
+		const now = new Date();
+
+		update((value) => {
+			value.push({
+				title: options.title,
+				message: options.message,
+				duration: options.duration ?? defaults.duration,
+				type: options.type ?? defaults.type,
+				variant: options.variant ?? defaults.variant,
+				expire,
 			});
-		}, options.duration ?? 3000);
+
+			return value.filter(({ expire }) => expire >= now);
+		});
 	}
 
 	function success(options: ToastMessage & ToastStyleOptions) {

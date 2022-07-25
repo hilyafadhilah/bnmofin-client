@@ -1,12 +1,20 @@
 <script lang="ts">
 	import { fastSlide } from "$transitions/fast-slide";
-	import type { ComponentType } from "svelte";
+	import { onMount } from "svelte";
+	// import type { ComponentType } from "svelte";
 
 	export let message: string;
 	export let title = "";
 	export let type: "primary" | "error" | "success" = "primary";
 	export let variant: "solid" | "outline" = "solid";
-	export let icon: ComponentType | null = null;
+	export let duration = 3000;
+	export let expire: Date | undefined = undefined;
+	// export let icon: ComponentType | null = null;
+
+	onMount(() => {
+		expire = new Date();
+		expire.setMilliseconds(expire.getMilliseconds() + duration);
+	});
 </script>
 
 <div

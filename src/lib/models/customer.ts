@@ -1,5 +1,16 @@
 import type { AuthRole } from "./auth";
 
+export type CustomerStatus = "verified" | "unverified";
+
+export interface Customer {
+	userId: number;
+	fullname: string;
+	idCardImage: string;
+	balance: number;
+	status: CustomerStatus;
+	created: string;
+}
+
 export interface RegisterPayload {
 	user: {
 		username: string;

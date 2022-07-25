@@ -64,4 +64,4 @@
 	<slot />
 </main>
 
-<ToastContainer messages={$toast} />
+<ToastContainer toasts={$toast} />

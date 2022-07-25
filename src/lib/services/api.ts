@@ -1,6 +1,6 @@
 import axios, { type AxiosRequestConfig } from "axios";
 import type { ApiResponse } from "$models/api";
-import type { Auth, AuthUser, LoginPayload } from "$models/auth";
+import type { Auth, CurrentUser, LoginPayload } from "$models/auth";
 import type { RegisterPayload } from "../models/customer";
 
 const fetch = axios.create({
@@ -13,8 +13,8 @@ async function login(payload: LoginPayload) {
 	return data.data;
 }
 
-async function getAuthUser(token: string) {
-	const { data } = await fetch.get<ApiResponse<AuthUser>>("/auth", {
+async function getAuth(token: string) {
+	const { data } = await fetch.get<ApiResponse<CurrentUser>>("/auth", {
 		headers: {
 			Authorization: `Bearer ${token}`,
 		},
@@ -130,7 +130,7 @@ async function send<Payload = any, Response = any>(
 
 export const api = {
 	login,
-	getAuthUser,
+	getAuth,
 	register,
 	get,
 	getMany,
