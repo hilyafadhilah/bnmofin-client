@@ -35,3 +35,12 @@ export class AppError {
 		);
 	}
 }
+
+export class UnauthorizedError extends AppError {
+	constructor(resource = "this page") {
+		super({
+			title: "Unauthorized",
+			message: `You are unauthorized to access ${resource}.`,
+		});
+	}
+}

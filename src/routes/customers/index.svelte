@@ -4,7 +4,8 @@
 
 	import type { Load } from "@sveltejs/kit";
 	import type { AdminCustomerResponse } from "$models/customer";
-	import type { Auth } from "$models/auth";
+	import { AuthRole, type Auth } from "$models/auth";
+	import { UnauthorizedError } from "$models/error";
 
 	function fetchData(auth?: Auth, page?: number) {
 		return api.getMany<AdminCustomerResponse[]>("/customer", {
@@ -15,6 +16,14 @@
 	}
 
 	export const load: Load = async ({ session }) => {
+		if (session.auth?.user.role !== AuthRole.Admin) {
+			toast.error(new UnauthorizedError());
+			return {
+				status: 307,
+				redirect: "/",
+			};
+		}
+
 		const data = await fetchData(session.auth).catch(toast.forwardError());
 
 		return {

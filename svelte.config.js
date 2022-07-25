@@ -20,6 +20,7 @@ const config = {
 			$root: path.resolve("src"),
 			$components: path.resolve("src/lib/components"),
 			$models: path.resolve("src/lib/models"),
+			$pages: path.resolve("src/lib/pages"),
 			$services: path.resolve("src/lib/services"),
 			$stores: path.resolve("src/lib/stores"),
 			$transitions: path.resolve("src/lib/transitions"),
