@@ -70,8 +70,8 @@
 
 		try {
 			const request = await api.send<
-			NewRequestPayload,
-			CustomerRequestResponse
+				NewRequestPayload,
+				CustomerRequestResponse
 			>("/request", {
 				method: "post",
 				payload,

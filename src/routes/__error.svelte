@@ -14,6 +14,13 @@
 	import { AppError } from "$models/error";
 	import { isTokenError } from "$utils/error";
 	import { page } from "$app/stores";
+	import { browser } from "$app/env";
+
+	const back = () => {
+		if (browser) {
+			window.history.back();
+		}
+	};
 </script>
 
 <div class="w-full mt-28 flex justify-center">
@@ -29,6 +36,10 @@
 				<a href="/logout" class="text-rose-500">
 					Click here to log in again.
 				</a>
+			</div>
+		{:else}
+			<div class="mt-4">
+				<button class="primary" on:click={back}> Go back </button>
 			</div>
 		{/if}
 	</div>
