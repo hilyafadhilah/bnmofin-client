@@ -24,6 +24,8 @@
 	}
 
 	const dispatch = createEventDispatcher();
+
+	let imageLoaded = false;
 </script>
 
 <Overlay class="flex flex-col items-center justify-center" bind:isOpen>
@@ -65,6 +67,7 @@
 									src={imgSrc}
 									alt="ID Card of {data.fullname}"
 									class="w-auto h-full mx-auto"
+									bind:loaded={imageLoaded}
 								>
 									<Spin class="h-16 w-16 absolute" />
 								</Image>
@@ -80,6 +83,7 @@
 				<button
 					class="primary w-full"
 					on:click={() => dispatch("verify", data)}
+					disabled={!imageLoaded}
 				>
 					Verify
 				</button>

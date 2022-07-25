@@ -2,7 +2,11 @@
 	export let src: string | undefined;
 	export let alt: string;
 
-	let loaded = false;
+	export let loaded = false;
+
+	$: if (!src) {
+		loaded = false;
+	}
 </script>
 
 {#if !loaded}
@@ -14,7 +18,8 @@
 		{src}
 		{alt}
 		on:load={() => (loaded = true)}
-		class={$$props.class}
+		class:opacity-0={!loaded}
+		class="transition-opacity {$$props.class}"
 		style={$$props.style}
 	/>
 {/if}

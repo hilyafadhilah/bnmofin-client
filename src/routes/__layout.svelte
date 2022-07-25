@@ -28,6 +28,8 @@
 	import { browser } from "$app/env";
 	import { goto } from "$app/navigation";
 	import { page, session } from "$app/stores";
+	import ToastContainer from "$lib/components/feedback/ToastContainer.svelte";
+	import { toast } from "$lib/stores/toast";
 
 	$: if (browser && !$session.auth && !$page.error) {
 		goto("/login");
@@ -49,7 +51,10 @@
 <Head title={$page.stuff.title} />
 
 {#if $session.auth}
-	<div class="sticky top-0 mb-4 bg-gray-100 text-slate-900 drop-shadow-lg">
+	<div
+		class="sticky top-0 mb-4 bg-gray-100 text-slate-900 drop-shadow-lg"
+		style:z-index="99"
+	>
 		<Header class="h-14" {navigationLinks} />
 	</div>
 {/if}
@@ -57,3 +62,5 @@
 <main>
 	<slot />
 </main>
+
+<ToastContainer messages={$toast} />

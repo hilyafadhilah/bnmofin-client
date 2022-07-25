@@ -29,11 +29,12 @@
 		bind:this={div}
 		transition:fade={{ duration: 300 }}
 		class="
-		bg-slate-500 bg-opacity-40
-			absolute z-50 top-0 left-0 w-full h-full
+		bg-slate-300 bg-opacity-50
+			absolute top-0 left-0 w-full h-full
 			pointer-events-none select-none
 			flex items-center justify-center
 		"
+		style:z-index="9"
 	>
 		<Spin class="text-white h-10 w-10" />
 	</div>

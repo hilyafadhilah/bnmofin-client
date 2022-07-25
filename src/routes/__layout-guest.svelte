@@ -5,6 +5,8 @@
 	import { browser } from "$app/env";
 	import { goto } from "$app/navigation";
 	import { page, session } from "$app/stores";
+	import ToastContainer from "$lib/components/feedback/ToastContainer.svelte";
+	import { toast } from "$lib/stores/toast";
 
 	$: if (browser && $session.auth) {
 		goto("/");
@@ -24,3 +26,5 @@
 		</div>
 	</main>
 </div>
+
+<ToastContainer messages={$toast} />

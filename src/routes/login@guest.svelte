@@ -15,6 +15,7 @@
 	import { session } from "$app/stores";
 	import { api } from "$lib/services/api";
 	import { set as setCookie } from "es-cookie";
+	import { toast } from "$lib/stores/toast";
 
 	let username = "";
 	let password = "";
@@ -35,6 +36,11 @@
 				return value;
 			});
 			setCookie("token", auth.token);
+
+			toast.push({
+				type: "success",
+				message: "Successfully signed in.",
+			});
 		} catch (err) {
 			error = new AppError(err);
 		} finally {
