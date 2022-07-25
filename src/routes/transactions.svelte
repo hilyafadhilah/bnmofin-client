@@ -18,7 +18,7 @@
 		const data = await fetchData(session.auth).catch(toast.forwardError());
 
 		return {
-			stuff: { title: "Requests" },
+			stuff: { title: "Transactions" },
 			props: {
 				data,
 			},
@@ -29,10 +29,15 @@
 <script lang="ts">
 	import Pagination from "$components/data/Pagination.svelte";
 	import { session } from "$app/stores";
-	import { idrFormat } from "$utils/data";
 	import type { ApiResponse } from "$models/api";
 	import SpinnerOverlay from "$components/overlay/SpinnerOverlay.svelte";
 	import TransferFragment from "$pages/fragment/TransferFragment.svelte";
+	import { sessionManager } from "$services/session-manager";
+	import Refresh from "$components/icons/Refresh.svelte";
+	import AdminTransactionsTable from "$components/view/AdminTransactionsTable.svelte";
+	import CustomerTransactionsTable from "$components/view/CustomerTransactionsTable.svelte";
+
+	let isCustomer = $session.auth?.user.role === AuthRole.Customer;
 
 	export let data: ApiResponse<TransactionResponse[]> | null;
 	let transactions: TransactionResponse[];
@@ -53,6 +58,10 @@
 		fetchData($session.auth, page)
 			.then((d) => (data = d))
 			.catch(toast.catchError());
+
+		if (isCustomer) {
+			sessionManager.refresh(session, $session);
+		}
 	};
 
 	let loading: boolean;
@@ -61,47 +70,42 @@
 	let isTransferring = false;
 </script>
 
-{#if $session.auth?.user.role === AuthRole.Customer}
-	<div
-		class="flex flex-wrap gap-2 justify-end my-2 pb-2 border-b border-slate-200"
-	>
-		<div class="flex-grow">
-			<h2 class="font-serif">Transaction History</h2>
-		</div>
-		<div>
+<div
+	class="flex flex-wrap gap-2 justify-end my-2 pb-2 border-b border-slate-200"
+>
+	<div class="flex-grow">
+		<h2 class="font-serif">
+			{isCustomer ? "Transaction History" : "Transactions"}
+		</h2>
+	</div>
+	<div class="flex items-center gap-2">
+		<button type="button" class="icon" on:click={reload}>
+			<Refresh class="text-slate-500" />
+		</button>
+		{#if isCustomer}
 			<button
 				type="button"
 				class="primary"
 				on:click={() => (isTransferring = true)}>Transfer</button
 			>
-		</div>
+		{/if}
 	</div>
+</div>
 
+{#if isCustomer}
 	<TransferFragment bind:isOpen={isTransferring} bind:transactions {pageSize} />
 {/if}
 
 <div class="w-full overflow-x-auto rounded-md" class:overflow-hidden={loading}>
 	<SpinnerOverlay {loading} />
-	<table class="data-table">
-		<thead>
-			<tr>
-				<th>Sender</th>
-				<th>Receiver</th>
-				<th>Amount (IDR)</th>
-				<th>Date</th>
-			</tr>
-		</thead>
-		<tbody>
-			{#each transactions as transaction}
-				<tr>
-					<td>{transaction.sender.user.username}</td>
-					<td>{transaction.receiver.user.username}</td>
-					<td class="text-right">{idrFormat(transaction.amount)}</td>
-					<td class="text-center font-mono">{transaction.created}</td>
-				</tr>
-			{/each}
-		</tbody>
-	</table>
+	{#if isCustomer && $session.auth}
+		<CustomerTransactionsTable
+			{transactions}
+			username={$session.auth.user.username}
+		/>
+	{:else}
+		<AdminTransactionsTable {transactions} />
+	{/if}
 </div>
 
 <div class="w-full my-4 flex justify-end">

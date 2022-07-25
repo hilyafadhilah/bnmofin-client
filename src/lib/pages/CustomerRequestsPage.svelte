@@ -15,6 +15,8 @@
 	} from "$models/request";
 	import type { Auth } from "$models/auth";
 	import type { CurrenciesResponse } from "$models/money";
+	import { sessionManager } from "../services/session-manager";
+	import Refresh from "../components/icons/Refresh.svelte";
 
 	export let fetchData: (
 		auth?: Auth,
@@ -39,6 +41,8 @@
 		fetchData($session.auth, page)
 			.then((d) => (data = d))
 			.catch(toast.catchError());
+
+		sessionManager.refresh(session, $session);
 	};
 
 	let loading: boolean;
@@ -66,8 +70,8 @@
 
 		try {
 			const request = await api.send<
-				NewRequestPayload,
-				CustomerRequestResponse
+			NewRequestPayload,
+			CustomerRequestResponse
 			>("/request", {
 				method: "post",
 				payload,
@@ -104,7 +108,10 @@
 	<div class="flex-grow">
 		<h2 class="font-serif">Your Requests</h2>
 	</div>
-	<div>
+	<div class="flex items-center gap-2">
+		<button type="button" class="icon" on:click={reload}>
+			<Refresh class="text-slate-500" />
+		</button>
 		<button type="button" class="primary" on:click={() => (isRequesting = true)}
 			>Issue New Request</button
 		>

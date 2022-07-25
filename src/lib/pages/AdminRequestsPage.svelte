@@ -15,6 +15,7 @@
 		RespondRequestPayload,
 	} from "$models/request";
 	import type { Auth } from "$models/auth";
+	import Refresh from "../components/icons/Refresh.svelte";
 
 	export let fetchData: (
 		auth?: Auth,
@@ -95,6 +96,19 @@
 		}
 	};
 </script>
+
+<div
+	class="flex flex-wrap gap-2 justify-end my-2 pb-2 border-b border-slate-200"
+>
+	<div class="flex-grow">
+		<h2 class="font-serif">Requests</h2>
+	</div>
+	<div class="flex items-center gap-2">
+		<button type="button" class="icon" on:click={reload}>
+			<Refresh class="text-slate-500" />
+		</button>
+	</div>
+</div>
 
 <div class="w-full overflow-x-auto rounded-md" class:overflow-hidden={loading}>
 	<SpinnerOverlay {loading} />
