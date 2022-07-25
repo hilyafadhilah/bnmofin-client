@@ -92,33 +92,33 @@
 			<hr class="mt-2 mb-4" />
 		{/if}
 		<div class="flex flex-col">
-			<FormItem label="Username" id="username">
+			<FormItem label="Username" id="register:username">
 				<input
-					id="username"
+					id="register:username"
 					name="username"
 					type="text"
 					bind:value={username}
 				/>
 			</FormItem>
-			<FormItem label="Password" id="password">
+			<FormItem label="Password" id="register:password">
 				<input
-					id="password"
+					id="register:password"
 					name="password"
 					type="password"
 					bind:value={password}
 				/>
 			</FormItem>
-			<FormItem label="Fullname" id="fullname">
+			<FormItem label="Fullname" id="register:fullname">
 				<input
-					id="fullname"
+					id="register:fullname"
 					name="fullname"
 					type="text"
 					bind:value={fullname}
 				/>
 			</FormItem>
-			<FormItem id="idCardImage" label="ID Card Image">
+			<FormItem id="register:idCardImage" label="ID Card Image">
 				<input
-					id="idCardImage"
+					id="register:idCardImage"
 					name="idCardImage"
 					type="file"
 					accept="image/jpeg, image/png, image/gif"

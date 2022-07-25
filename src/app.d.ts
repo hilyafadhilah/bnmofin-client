@@ -12,6 +12,7 @@ declare namespace App {
 
 	interface Session {
 		auth?: import("$models/auth").Auth;
+		customer?: import("$models/customer").AdminCustomerResponse;
 	}
 
 	interface Stuff {

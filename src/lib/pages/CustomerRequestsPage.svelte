@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { session } from "$app/stores";
-	import { idrFormat } from "$utils/data";
+	import { idrFormat, moneyFormat } from "$utils/data";
 	import { toast } from "$stores/toast";
-	import { api } from "$root/lib/services/api";
+	import { api } from "$services/api";
 
 	import Pagination from "$components/data/Pagination.svelte";
 	import SpinnerOverlay from "$components/overlay/SpinnerOverlay.svelte";
-	import NewRequestDialog from "$root/lib/components/view/NewRequestDialog.svelte";
+	import NewRequestDialog from "$components/view/NewRequestDialog.svelte";
 
 	import type { ApiResponse } from "$models/api";
 	import type {
@@ -14,7 +14,7 @@
 		NewRequestPayload,
 	} from "$models/request";
 	import type { Auth } from "$models/auth";
-	import type { CurrenciesResponse } from "$root/lib/models/money";
+	import type { CurrenciesResponse } from "$models/money";
 
 	export let fetchData: (
 		auth?: Auth,
@@ -76,7 +76,10 @@
 
 			toast.success({
 				title: "Successful",
-				message: `Successfully requested ${payload.money.amount} ${payload.money.currency}.`,
+				message: `Successfully requested ${moneyFormat(
+					payload.money.amount,
+					payload.money.currency
+				)}.`,
 				duration: 5000,
 			});
 
@@ -84,7 +87,8 @@
 				requests.pop();
 			}
 
-			requests = [request, ...requests];
+			requests.splice(0, 0, request);
+			requests = requests;
 		} catch (error) {
 			toast.error(error);
 		} finally {

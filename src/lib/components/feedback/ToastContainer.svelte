@@ -12,8 +12,15 @@
 	p-2 sm:p-4
 	flex flex-col gap-2 sm:gap-4
 "
+	style:z-index="999"
 >
 	{#each messages as message (message)}
-		<Toast {...message} />
+		<Toast
+			title={message.title}
+			message={message.message}
+			type={message.type}
+			variant={message.variant}
+			icon={message.icon}
+		/>
 	{/each}
 </div>

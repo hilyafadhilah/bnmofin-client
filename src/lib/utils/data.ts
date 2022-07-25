@@ -4,3 +4,10 @@ export function idrFormat(num: number) {
 		currency: "IDR",
 	}).format(num);
 }
+
+export function moneyFormat(num: number, currency: string) {
+	return new Intl.NumberFormat("id-ID", {
+		style: "currency",
+		currency,
+	}).format(num);
+}

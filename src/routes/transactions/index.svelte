@@ -4,7 +4,7 @@
 
 	import type { TransactionResponse } from "$models/transaction";
 	import type { Load } from "@sveltejs/kit";
-	import type { Auth } from "$models/auth";
+	import { AuthRole, type Auth } from "$models/auth";
 
 	function fetchData(auth?: Auth, page?: number) {
 		return api.getMany<TransactionResponse[]>("/transfer", {
@@ -32,6 +32,7 @@
 	import { idrFormat } from "$utils/data";
 	import type { ApiResponse } from "$models/api";
 	import SpinnerOverlay from "$components/overlay/SpinnerOverlay.svelte";
+	import TransferFragment from "$pages/fragment/TransferFragment.svelte";
 
 	export let data: ApiResponse<TransactionResponse[]> | null;
 	let transactions: TransactionResponse[];
@@ -56,7 +57,28 @@
 
 	let loading: boolean;
 	$: loading = !data;
+
+	let isTransferring = false;
 </script>
+
+{#if $session.auth?.user.role === AuthRole.Customer}
+	<div
+		class="flex flex-wrap gap-2 justify-end my-2 pb-2 border-b border-slate-200"
+	>
+		<div class="flex-grow">
+			<h2 class="font-serif">Transaction History</h2>
+		</div>
+		<div>
+			<button
+				type="button"
+				class="primary"
+				on:click={() => (isTransferring = true)}>Transfer</button
+			>
+		</div>
+	</div>
+
+	<TransferFragment bind:isOpen={isTransferring} bind:transactions {pageSize} />
+{/if}
 
 <div class="w-full overflow-x-auto rounded-md" class:overflow-hidden={loading}>
 	<SpinnerOverlay {loading} />

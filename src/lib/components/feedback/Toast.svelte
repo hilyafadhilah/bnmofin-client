@@ -15,7 +15,6 @@
 	class="w-full px-4 py-2 border-2
 		rounded-md drop-shadow-md
 		break-words {type} {variant}"
-	style:z-index="999"
 	style:min-height="96px"
 	style:white-space="normal"
 >

@@ -8,7 +8,7 @@
 {#if isOpen}
 	<div
 		transition:fade={{ duration }}
-		style:z-index="999"
+		style:z-index="100"
 		class="
 			fixed top-0 left-0 w-full h-full
 			bg-slate-900 bg-opacity-60

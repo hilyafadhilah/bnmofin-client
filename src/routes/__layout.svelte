@@ -30,6 +30,7 @@
 	import { page, session } from "$app/stores";
 	import ToastContainer from "$components/feedback/ToastContainer.svelte";
 	import { toast } from "$stores/toast";
+	import { AuthRole } from "$models/auth";
 
 	$: if (browser && !$session.auth && !$page.error) {
 		goto("/login");
@@ -42,7 +43,7 @@
 		{ href: "/logout", label: "Logout" },
 	];
 
-	$: if ($session.auth?.user.role === "Admin") {
+	$: if ($session.auth?.user.role === AuthRole.Admin) {
 		navigationLinks.splice(1, 0, { href: "/customers", label: "Customers" });
 		navigationLinks = navigationLinks;
 	}

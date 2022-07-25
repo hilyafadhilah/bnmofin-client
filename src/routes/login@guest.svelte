@@ -15,7 +15,6 @@
 	import { session } from "$app/stores";
 	import { api } from "$services/api";
 	import { set as setCookie } from "es-cookie";
-	import { toast } from "$stores/toast";
 
 	let username = "";
 	let password = "";
@@ -36,11 +35,6 @@
 				return value;
 			});
 			setCookie("token", auth.token);
-
-			toast.push({
-				type: "success",
-				message: "Successfully signed in.",
-			});
 		} catch (err) {
 			error = new AppError(err);
 		} finally {
@@ -63,11 +57,11 @@
 	{/if}
 	<form on:submit={submitHandler}>
 		<div class="flex flex-col">
-			<FormItem label="Username" id="username">
-				<input id="username" bind:value={username} />
+			<FormItem label="Username" id="login:username">
+				<input id="login:username" bind:value={username} />
 			</FormItem>
-			<FormItem label="Password" id="password">
-				<input id="password" type="password" bind:value={password} />
+			<FormItem label="Password" id="login:password">
+				<input id="login:password" type="password" bind:value={password} />
 			</FormItem>
 			<button type="submit" class="primary mt-2"> Submit </button>
 		</div>
