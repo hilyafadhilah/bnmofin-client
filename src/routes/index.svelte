@@ -10,6 +10,9 @@
 
 <script lang="ts">
 	import { session } from "$app/stores";
+	import UserLayout from "$components/layouts/UserLayout.svelte";
 </script>
 
-Hi, {$session.auth?.user.username}.
+<UserLayout>
+	Hi, {$session.auth?.user.username}.
+</UserLayout>

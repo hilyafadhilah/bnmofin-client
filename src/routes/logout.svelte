@@ -7,11 +7,19 @@
 		sessionManager.logout(session);
 
 		return {
-			status: 307,
-			redirect: "/login",
 			stuff: { title: "Logout" },
 		};
 	};
 </script>
 
-Logging out...
+<script>
+	import { browser } from "$app/env";
+	import { goto } from "$app/navigation";
+	import UserLayout from "$components/layouts/UserLayout.svelte";
+
+	if (browser) {
+		goto("/login");
+	}
+</script>
+
+<UserLayout>Logging out...</UserLayout>

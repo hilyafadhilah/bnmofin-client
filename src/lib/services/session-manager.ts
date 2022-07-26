@@ -66,12 +66,16 @@ async function login(session: Writable<App.Session>, payload: LoginPayload) {
 		return value;
 	});
 
-	set(tokenCookieKey, auth.token);
+	if (browser) {
+		set(tokenCookieKey, auth.token);
+	}
 }
 
 async function logout(session: App.Session) {
 	delete session.auth;
-	remove(tokenCookieKey);
+	if (browser) {
+		remove(tokenCookieKey);
+	}
 }
 
 export const sessionManager = {

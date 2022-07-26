@@ -1,29 +1,9 @@
-<script lang="ts" context="module">
-	import type { Load } from "@sveltejs/kit";
-	import { firebase } from "$services/firebase";
-
-	export const load: Load = ({ session }) => {
-		if (!session.auth) {
-			return {
-				status: 307,
-				redirect: "/login",
-			};
-		}
-
-		firebase.init();
-
-		return {};
-	};
-</script>
-
 <script lang="ts">
 	import "$root/app.css";
-	import Head from "$components/Head.svelte";
 	import Header from "$components/layout/Header.svelte";
 	import { browser } from "$app/env";
 	import { afterNavigate, goto } from "$app/navigation";
-	import { page, session } from "$app/stores";
-	import ToastContainer from "$components/feedback/ToastContainer.svelte";
+	import { session } from "$app/stores";
 	import { toast } from "$stores/toast";
 	import { AuthRole } from "$models/auth";
 	import { sessionManager } from "$services/session-manager";
@@ -49,12 +29,7 @@
 	});
 
 	afterNavigate(({ from, to }) => {
-		if (from?.host === to.host && from.pathname === "/login") {
-			toast.success({
-				title: `Welcome ${$session.auth?.user.username}!`,
-				message: "You have successfully logged in.",
-			});
-		} else if (from?.host !== to.host) {
+		if (from?.host !== to.host && $session.auth) {
 			toast.success({
 				title: `Welcome back, ${$session.auth?.user.username}`,
 				message: "You are logged in.",
@@ -63,17 +38,15 @@
 	});
 </script>
 
-<Head title={$page.stuff.title} />
+{#if $session.auth}
+	<div
+		class="sticky top-0 mb-4 bg-gray-100 text-slate-900 drop-shadow-lg"
+		style:z-index="99"
+	>
+		<Header class="h-14" {navigationLinks} />
+	</div>
 
-<div
-	class="sticky top-0 mb-4 bg-gray-100 text-slate-900 drop-shadow-lg"
-	style:z-index="99"
->
-	<Header class="h-14" {navigationLinks} />
-</div>
-
-<main>
-	<slot />
-</main>
-
-<ToastContainer toasts={$toast} />
+	<main>
+		<slot />
+	</main>
+{/if}

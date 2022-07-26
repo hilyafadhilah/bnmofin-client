@@ -30,12 +30,15 @@
 	import AdminRequestsPage from "$pages/AdminRequestsPage.svelte";
 	import CustomerRequestsPage from "$pages/CustomerRequestsPage.svelte";
 	import type { ApiCollectionResponse } from "$models/api";
+	import UserLayout from "$components/layouts/UserLayout.svelte";
 
 	export let data: ApiCollectionResponse<any>;
 </script>
 
-{#if $session.auth?.user.role === AuthRole.Admin}
-	<AdminRequestsPage {fetchData} {data} />
-{:else}
-	<CustomerRequestsPage {fetchData} {data} />
-{/if}
+<UserLayout>
+	{#if $session.auth?.user.role === AuthRole.Admin}
+		<AdminRequestsPage {fetchData} {data} />
+	{:else}
+		<CustomerRequestsPage {fetchData} {data} />
+	{/if}
+</UserLayout>

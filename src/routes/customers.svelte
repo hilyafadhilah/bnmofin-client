@@ -44,6 +44,7 @@
 	import Pagination from "$components/data/Pagination.svelte";
 	import SpinnerOverlay from "$components/overlay/SpinnerOverlay.svelte";
 	import Refresh from "$components/icons/Refresh.svelte";
+	import UserLayout from "$components/layouts/UserLayout.svelte";
 
 	export let data: ApiResponse<AdminCustomerResponse[]> | null;
 	let customers: AdminCustomerResponse[];
@@ -115,68 +116,73 @@
 	};
 </script>
 
-<div
-	class="flex flex-wrap gap-2 justify-end my-2 pb-2 border-b border-slate-200"
->
-	<div class="flex-grow">
-		<h2 class="font-serif">Customers</h2>
+<UserLayout>
+	<div
+		class="flex flex-wrap gap-2 justify-end my-2 pb-2 border-b border-slate-200"
+	>
+		<div class="flex-grow">
+			<h2 class="font-serif">Customers</h2>
+		</div>
+		<div class="flex items-center gap-2">
+			<button type="button" class="icon" on:click={reload}>
+				<Refresh class="text-slate-500" />
+			</button>
+		</div>
 	</div>
-	<div class="flex items-center gap-2">
-		<button type="button" class="icon" on:click={reload}>
-			<Refresh class="text-slate-500" />
-		</button>
-	</div>
-</div>
 
-<div class="w-full overflow-x-auto rounded-md" class:overflow-hidden={loading}>
-	<SpinnerOverlay {loading} />
-	<table class="data-table">
-		<thead>
-			<tr>
-				<th>Username</th>
-				<th>Fullname</th>
-				<th>Balance</th>
-				<th>Status</th>
-				<th>Created</th>
-				<th />
-			</tr>
-		</thead>
-		<tbody>
-			{#each customers as customer}
+	<div
+		class="w-full overflow-x-auto rounded-md"
+		class:overflow-hidden={loading}
+	>
+		<SpinnerOverlay {loading} />
+		<table class="data-table">
+			<thead>
 				<tr>
-					<td>{customer.user.username}</td>
-					<td>{customer.fullname}</td>
-					<td class="text-right"
-						>{customer.status === "verified"
-							? idrFormat(customer.balance)
-							: "-"}</td
-					>
-					<td class="text-center">{customer.status}</td>
-					<td class="text-center font-mono">{customer.created}</td>
-					<td class="text-right">
-						<button
-							class="primary w-36"
-							class:variant-outline={customer.status === "verified"}
-							on:click={() => openDetails(customer)}
-						>
-							{customer.status === "verified" ? "View" : "View & Verify"}
-						</button>
-					</td>
+					<th>Username</th>
+					<th>Fullname</th>
+					<th>Balance</th>
+					<th>Status</th>
+					<th>Created</th>
+					<th />
 				</tr>
-			{/each}
-		</tbody>
-	</table>
-</div>
+			</thead>
+			<tbody>
+				{#each customers as customer}
+					<tr>
+						<td>{customer.user.username}</td>
+						<td>{customer.fullname}</td>
+						<td class="text-right"
+							>{customer.status === "verified"
+								? idrFormat(customer.balance)
+								: "-"}</td
+						>
+						<td class="text-center">{customer.status}</td>
+						<td class="text-center font-mono">{customer.created}</td>
+						<td class="text-right">
+							<button
+								class="primary w-36"
+								class:variant-outline={customer.status === "verified"}
+								on:click={() => openDetails(customer)}
+							>
+								{customer.status === "verified" ? "View" : "View & Verify"}
+							</button>
+						</td>
+					</tr>
+				{/each}
+			</tbody>
+		</table>
+	</div>
 
-<div class="w-full my-4 flex justify-end">
-	<Pagination
-		bind:page
-		{pageSize}
-		{totalItems}
-		on:change={reload}
-		disabled={loading}
-	/>
-</div>
+	<div class="w-full my-4 flex justify-end">
+		<Pagination
+			bind:page
+			{pageSize}
+			{totalItems}
+			on:change={reload}
+			disabled={loading}
+		/>
+	</div>
+</UserLayout>
 
 <!-- View Details -->
 {#if selected}

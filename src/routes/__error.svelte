@@ -1,7 +1,14 @@
 <script lang="ts" context="module">
 	import type { Load } from "@sveltejs/kit";
 
-	export const load: Load = () => {
+	export const load: Load = ({ error }) => {
+		if (isTokenError(error)) {
+			return {
+				status: 307,
+				redirect: "/login",
+			};
+		}
+
 		return {
 			stuff: {
 				title: "Error",
