@@ -19,7 +19,7 @@
 "
 	style:z-index="999"
 >
-	{#each visible as toast}
+	{#each visible as toast (toast)}
 		<Toast
 			title={toast.title}
 			message={toast.message}

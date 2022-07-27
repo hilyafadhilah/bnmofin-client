@@ -40,16 +40,42 @@
 
 @layer components {
 	button.primary {
-		@apply bg-rose-500 border-rose-500
-		text-white
-		hover:bg-rose-600
+		@apply bg-rose-500 border-rose-500 text-white
+		hover:bg-rose-600 hover:border-rose-600
 		focus:outline-teal-800
 		disabled:bg-rose-300 disabled:border-rose-300;
 	}
 
+	button.alert {
+		@apply text-white bg-sky-600 border-sky-600
+		hover:bg-sky-700 hover:border-sky-700
+		focus:outline-indigo-700
+		disabled:bg-sky-300 disabled:border-sky-300;
+	}
+
+	button.danger {
+		@apply text-white bg-red-500 border-red-500
+			hover:bg-red-600
+			focus:outline-red-900
+			disabled:bg-red-300 disabled:border-red-300;
+	}
+
+	button.variant-outline {
+		@apply bg-transparent;
+	}
+
 	button.primary.variant-outline {
-		@apply bg-transparent
-		text-rose-500 border-rose-500
+		@apply text-rose-500 border-rose-500
 		hover:bg-rose-300 hover:bg-opacity-30;
+	}
+
+	button.alert.variant-outline {
+		@apply text-sky-600
+			hover:bg-sky-300 hover:bg-opacity-30;
+	}
+
+	button.danger.variant-outline {
+		@apply text-red-500
+			hover:bg-red-300 hover:bg-opacity-30;
 	}
 }

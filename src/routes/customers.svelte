@@ -127,18 +127,18 @@
 		if (selected) {
 			try {
 				confirmLoading = true;
-				await api.send(`/customer/${selected.userId}/verify`, {
+				await api.send(`/customer/${selected.user.username}/verify`, {
 					method: "put",
 					auth: $session.auth,
 				});
 
 				toast.success({
 					title: "Successful",
-					message: `Successfully verified ${selected.user.username}.`,
+					message: `Successfully verified @${selected.user.username}.`,
 				});
 
 				selected.status = "verified";
-				customers = customers;
+				customers = [...customers];
 			} catch (err) {
 				toast.error(err);
 			} finally {
@@ -172,7 +172,7 @@
 		<div
 			class="grid"
 			style="
-				grid-template-columns: repeat(auto-fill, minmax(min(24rem, 100%), 1fr));
+				grid-template-columns: repeat(auto-fill, minmax(min(18rem, 100%), 1fr));
 				row-gap: 1rem;
 				column-gap: .8rem;
 			"
@@ -185,9 +185,9 @@
 					tabindex="0"
 					on:click={() => openDetails(customer)}
 				>
-					<div class="text-lg">@{customer.user.username}</div>
+					<div class="text-xl font-semibold">@{customer.user.username}</div>
 					<div>{customer.fullname}</div>
-					<div class="text-right text-sm italic">
+					<div class="text-right text-sm italic text-slate-500">
 						signed up {timeAgo.format(new Date(customer.created))}
 					</div>
 					<hr class="my-2 -mx-2" />

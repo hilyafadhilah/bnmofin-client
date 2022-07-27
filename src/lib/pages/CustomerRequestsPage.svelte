@@ -1,12 +1,17 @@
 <script lang="ts">
 	import { session } from "$app/stores";
-	import { idrFormat, moneyFormat } from "$utils/data";
+	import { idrFormat, moneyFormat, timeAgo } from "$utils/data";
 	import { toast } from "$stores/toast";
 	import { api } from "$services/api";
 
-	import Pagination from "$components/data/Pagination.svelte";
 	import SpinnerOverlay from "$components/overlay/SpinnerOverlay.svelte";
 	import NewRequestDialog from "$components/view/NewRequestDialog.svelte";
+	import Refresh from "$components/icons/Refresh.svelte";
+	import UserLayout from "$components/layouts/UserLayout.svelte";
+	import Check from "$components/icons/Check.svelte";
+	import Cross from "$components/icons/Cross.svelte";
+
+	import { fastSlide } from "$transitions/fast-slide";
 
 	import type { ApiResponse } from "$models/api";
 	import type {
@@ -15,38 +20,64 @@
 	} from "$models/request";
 	import type { Auth } from "$models/auth";
 	import type { CurrenciesResponse } from "$models/money";
-	import { sessionManager } from "../services/session-manager";
-	import Refresh from "../components/icons/Refresh.svelte";
 
 	export let fetchData: (
 		auth?: Auth,
-		page?: number
+		skip?: number,
+		take?: number
 	) => Promise<ApiResponse<CustomerRequestResponse[]>>;
-	export let data: ApiResponse<CustomerRequestResponse[]> | null;
+
+	export let response: ApiResponse<CustomerRequestResponse[]>;
+
 	let requests: CustomerRequestResponse[];
+	$: requests = response.data;
 
-	let page: number;
-	let pageSize: number;
-	let totalItems: number;
+	let total: number;
+	$: total = response.meta.total;
 
-	$: if (data) {
-		requests = data.data;
-		page = data.meta.page;
-		pageSize = data.meta.pageSize;
-		totalItems = data.meta.totalItems;
-	}
+	let loading = false;
 
-	const reload = () => {
-		data = null;
-		fetchData($session.auth, page)
-			.then((d) => (data = d))
-			.catch(toast.catchError());
-
-		sessionManager.refresh(session, $session);
+	const reload = async () => {
+		loading = true;
+		try {
+			response = await fetchData($session.auth);
+		} catch (err) {
+			toast.error(err);
+		} finally {
+			loading = false;
+		}
 	};
 
-	let loading: boolean;
-	$: loading = !data;
+	const loadNext = async () => {
+		loading = true;
+		try {
+			const { meta, data } = await fetchData($session.auth, requests.length);
+
+			if (meta.total === total) {
+				requests = [...requests, ...data];
+			} else if (meta.total > total) {
+				requests = [
+					...(await loadNew(meta.total - total)),
+					...requests,
+					...data,
+				];
+			}
+		} catch (err) {
+			toast.error(err);
+		} finally {
+			loading = false;
+		}
+	};
+
+	const loadNew = async (take: number, skip = 0) => {
+		const { meta, data } = await fetchData($session.auth, skip, take);
+
+		if (meta.take < take) {
+			data.push(...(await loadNew(take - meta.take, skip + meta.take)));
+		}
+
+		return data;
+	};
 
 	// new request
 
@@ -97,12 +128,8 @@
 				duration: 5000,
 			});
 
-			if (requests.length === pageSize) {
-				requests.pop();
-			}
-
 			requests.splice(0, 0, request);
-			requests = requests;
+			requests = [...requests];
 
 			reset();
 		} catch (error) {
@@ -114,21 +141,101 @@
 	};
 </script>
 
-<div
-	class="flex flex-wrap gap-2 justify-end my-2 pb-2 border-b border-slate-200"
->
-	<div class="flex-grow">
-		<h2 class="font-serif">Your Requests</h2>
+<UserLayout>
+	<div
+		class="flex flex-wrap gap-2 justify-end my-2 pb-2 border-b border-slate-200"
+	>
+		<div class="flex-grow">
+			<h2 class="font-serif">Requests</h2>
+		</div>
+		<div class="flex items-center gap-2">
+			<button type="button" class="icon" on:click={reload}>
+				<Refresh class="text-slate-500" />
+			</button>
+			<button
+				type="button"
+				class="primary"
+				on:click={() => (isRequesting = true)}>Issue New Request</button
+			>
+		</div>
 	</div>
-	<div class="flex items-center gap-2">
-		<button type="button" class="icon" on:click={reload}>
-			<Refresh class="text-slate-500" />
-		</button>
-		<button type="button" class="primary" on:click={() => (isRequesting = true)}
-			>Issue New Request</button
+
+	<div class="w-full rounded-md" class:overflow-hidden={loading}>
+		<SpinnerOverlay {loading} />
+
+		<div
+			class="grid"
+			style="
+				grid-template-columns: repeat(auto-fill, minmax(min(18rem, 100%), 1fr));
+				row-gap: 1rem;
+				column-gap: .8rem;
+			"
 		>
+			{#each requests as request}
+				<div
+					class="
+						card flex flex-col
+						{request.response
+						? request.response.status === 'accepted'
+							? 'responded accepted'
+							: 'responded declined'
+						: 'pending'}
+					"
+					transition:fastSlide|local={{ axis: "Y", direction: "+" }}
+				>
+					<div class="flex flex-wrap text-slate-500 text-sm justify-between">
+						<div class="flex-grow font-mono">
+							{request.created}
+						</div>
+						<div class="flex-grow italic  text-right whitespace-nowrap">
+							{timeAgo.format(new Date(request.created))}
+						</div>
+					</div>
+					<hr class="my-2" />
+					<div class="flex justify-end font-mono text-md sm:text-lg">
+						<div
+							class="
+								p-2 rounded-md amount
+								{request.amount > 0 ? 'positive-amount' : 'negative-amount'}
+							"
+						>
+							{request.amount > 0
+								? "+" + idrFormat(request.amount)
+								: idrFormat(request.amount)}
+						</div>
+					</div>
+					<hr class="my-2" />
+					<div
+						style="min-height: 3rem;"
+						class="flex-grow flex items-center justify-center gap-2 flex-wrap text-center"
+					>
+						{#if !request.response}
+							<div class="flex items-center justify-start text-slate-500">
+								Pending
+							</div>
+						{:else if request.response.status === "accepted"}
+							<div class="flex items-center justify-start text-sky-600">
+								<Check class="mr-1" /> Accepted
+							</div>
+						{:else}
+							<div class="flex items-center text-red-500">
+								<Cross class="mr-1" /> Declined
+							</div>
+						{/if}
+					</div>
+				</div>
+			{/each}
+		</div>
+
+		{#if requests.length < total}
+			<div class="w-full mt-4 py-6 flex justify-center text-center">
+				<button class="primary w-52 text-lg" on:click={loadNext}
+					>Load more</button
+				>
+			</div>
+		{/if}
 	</div>
-</div>
+</UserLayout>
 
 <NewRequestDialog
 	bind:isOpen={isRequesting}
@@ -138,43 +245,29 @@
 	on:submit={() => submitRequest()}
 />
 
-<div class="w-full overflow-x-auto rounded-md" class:overflow-hidden={loading}>
-	<SpinnerOverlay {loading} />
-	<table class="data-table">
-		<thead>
-			<tr>
-				<th>Amount (IDR)</th>
-				<th>Date</th>
-				<th>Status</th>
-			</tr>
-		</thead>
-		<tbody>
-			{#each requests as request}
-				<tr class={request.status}>
-					<td class="text-right">{idrFormat(request.amount)}</td>
-					<td class="text-center font-mono">{request.created}</td>
-					<td class="text-center">{request.status}</td>
-				</tr>
-			{/each}
-		</tbody>
-	</table>
-</div>
-
-<div class="w-full my-4 flex justify-end">
-	<Pagination
-		bind:page
-		{pageSize}
-		{totalItems}
-		on:change={reload}
-		disabled={loading}
-	/>
-</div>
-
 <style lang="postcss">
-	tr.accepted {
-		@apply bg-emerald-100 border-emerald-300;
+	.accepted {
+		@apply bg-sky-100 border-sky-300 hover:border-sky-400;
 	}
-	tr.declined {
-		@apply bg-red-100 border-red-300;
+	.accepted hr {
+		@apply border-sky-300;
+	}
+	.declined {
+		@apply bg-red-100 border-red-300 hover:border-red-400;
+	}
+	.declined hr {
+		@apply border-red-300;
+	}
+	.pending {
+		@apply bg-slate-50;
+	}
+	.accepted .amount {
+		@apply text-white;
+	}
+	.accepted .positive-amount {
+		@apply bg-emerald-600;
+	}
+	.accepted .negative-amount {
+		@apply bg-rose-500;
 	}
 </style>

@@ -69,7 +69,6 @@
 
 			if (meta.total === total) {
 				transactions = transactions.concat(data);
-				console.log(data);
 			} else if (meta.total > total) {
 				transactions = [
 					...(await loadNew(meta.total - total)),

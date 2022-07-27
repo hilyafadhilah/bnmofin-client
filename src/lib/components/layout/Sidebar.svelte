@@ -37,7 +37,7 @@
 		</div>
 		<hr class="my-2" />
 		<div class="text-center overflow-x-clip">
-			<div class="text-lg font-bold">
+			<div class="text-lg font-semibold">
 				@{auth.user.username}
 			</div>
 			<div class="text-sm whitespace-nowrap">

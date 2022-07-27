@@ -5,21 +5,21 @@
 	import type { Load } from "@sveltejs/kit";
 	import { AuthRole, type Auth } from "$models/auth";
 
-	function fetchData(auth?: Auth, page?: number) {
+	function fetchData(auth?: Auth, skip = 0, take = 25) {
 		return api.getMany<any[]>("/request", {
 			auth,
-			page,
-			pageSize: 25,
+			skip,
+			take,
 		});
 	}
 
 	export const load: Load = async ({ session }) => {
-		const data = await fetchData(session.auth).catch(toast.forwardError());
+		const response = await fetchData(session.auth).catch(toast.forwardError());
 
 		return {
 			stuff: { title: "Requests" },
 			props: {
-				data,
+				response,
 			},
 		};
 	};
@@ -30,15 +30,12 @@
 	import AdminRequestsPage from "$pages/AdminRequestsPage.svelte";
 	import CustomerRequestsPage from "$pages/CustomerRequestsPage.svelte";
 	import type { ApiCollectionResponse } from "$models/api";
-	import UserLayout from "$components/layouts/UserLayout.svelte";
 
-	export let data: ApiCollectionResponse<any>;
+	export let response: ApiCollectionResponse<any>;
 </script>
 
-<UserLayout>
-	{#if $session.auth?.user.role === AuthRole.Admin}
-		<AdminRequestsPage {fetchData} {data} />
-	{:else}
-		<CustomerRequestsPage {fetchData} {data} />
-	{/if}
-</UserLayout>
+{#if $session.auth?.user.role === AuthRole.Admin}
+	<AdminRequestsPage {fetchData} {response} />
+{:else}
+	<CustomerRequestsPage {fetchData} {response} />
+{/if}

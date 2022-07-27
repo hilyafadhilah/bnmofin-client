@@ -79,7 +79,7 @@
 				</button>
 			</div>
 			<div class="px-2 overflow-x-clip">
-				<div class="text-2xl font-bold">
+				<div class="text-2xl font-semibold">
 					@{auth.user.username}
 				</div>
 				<div class="text-sm whitespace-nowrap">

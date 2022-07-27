@@ -1,49 +1,84 @@
 <script lang="ts">
 	import { session } from "$app/stores";
-	import { idrFormat } from "$utils/data";
+	import { idrFormat, timeAgo } from "$utils/data";
 	import { toast } from "$stores/toast";
 	import { api } from "$services/api";
 
 	import ConfirmDialog from "$components/overlay/ConfirmDialog.svelte";
-	import Pagination from "$components/data/Pagination.svelte";
 	import SpinnerOverlay from "$components/overlay/SpinnerOverlay.svelte";
+	import UserLayout from "$components/layouts/UserLayout.svelte";
+	import Refresh from "$components/icons/Refresh.svelte";
+	import Cross from "$components/icons/Cross.svelte";
+	import Check from "$components/icons/Check.svelte";
 
-	import type { ApiResponse } from "$models/api";
 	import type {
 		AdminRequestResponse,
 		RequestResponseStatus,
 		RespondRequestPayload,
 	} from "$models/request";
 	import type { Auth } from "$models/auth";
-	import Refresh from "../components/icons/Refresh.svelte";
+	import type { ApiResponse } from "$models/api";
+	import { fastSlide } from "../transitions/fast-slide";
 
 	export let fetchData: (
 		auth?: Auth,
-		page?: number
+		skip?: number,
+		take?: number
 	) => Promise<ApiResponse<AdminRequestResponse[]>>;
-	export let data: ApiResponse<AdminRequestResponse[]> | null;
+
+	export let response: ApiResponse<AdminRequestResponse[]>;
+
 	let requests: AdminRequestResponse[];
+	$: requests = response.data;
 
-	let page: number;
-	let pageSize: number;
-	let totalItems: number;
+	let total: number;
+	$: total = response.meta.total;
 
-	$: if (data) {
-		requests = data.data;
-		page = data.meta.page;
-		pageSize = data.meta.pageSize;
-		totalItems = data.meta.totalItems;
-	}
+	let loading = false;
 
-	const reload = () => {
-		data = null;
-		fetchData($session.auth, page)
-			.then((d) => (data = d))
-			.catch(toast.catchError());
+	const reload = async () => {
+		loading = true;
+		try {
+			response = await fetchData($session.auth);
+		} catch (err) {
+			toast.error(err);
+		} finally {
+			loading = false;
+		}
 	};
 
-	let loading: boolean;
-	$: loading = !data;
+	$: console.log(requests);
+
+	const loadNext = async () => {
+		loading = true;
+		try {
+			const { meta, data } = await fetchData($session.auth, requests.length);
+
+			if (meta.total === total) {
+				requests = [...requests, ...data];
+			} else if (meta.total > total) {
+				requests = [
+					...(await loadNew(meta.total - total)),
+					...requests,
+					...data,
+				];
+			}
+		} catch (err) {
+			toast.error(err);
+		} finally {
+			loading = false;
+		}
+	};
+
+	const loadNew = async (take: number, skip = 0) => {
+		const { meta, data } = await fetchData($session.auth, skip, take);
+
+		if (meta.take < take) {
+			data.push(...(await loadNew(take - meta.take, skip + meta.take)));
+		}
+
+		return data;
+	};
 
 	// respond
 
@@ -72,19 +107,22 @@
 			try {
 				confirmLoading = true;
 
-				await api.send<RespondRequestPayload>(`request/${selected.id}/status`, {
-					method: "put",
-					payload: { status: newStatus },
-					auth: $session.auth,
-				});
+				const newResponse = await api.send<RespondRequestPayload>(
+					`request/${selected.id}/response`,
+					{
+						method: "post",
+						payload: { status: newStatus },
+						auth: $session.auth,
+					}
+				);
 
 				toast.success({
 					title: "Successful",
 					message: `Successfully ${newStatus} the request.`,
 				});
 
-				selected.status = newStatus;
-				requests = requests;
+				selected.response = newResponse;
+				requests = [...requests];
 			} catch (err) {
 				toast.error(err);
 			} finally {
@@ -97,72 +135,118 @@
 	};
 </script>
 
-<div
-	class="flex flex-wrap gap-2 justify-end my-2 pb-2 border-b border-slate-200"
->
-	<div class="flex-grow">
-		<h2 class="font-serif">Requests</h2>
+<UserLayout>
+	<div
+		class="flex flex-wrap gap-2 justify-end my-2 pb-2 border-b border-slate-200"
+	>
+		<div class="flex-grow">
+			<h2 class="font-serif">Requests</h2>
+		</div>
+		<div class="flex items-center gap-2">
+			<button type="button" class="icon" on:click={reload}>
+				<Refresh class="text-slate-500" />
+			</button>
+		</div>
 	</div>
-	<div class="flex items-center gap-2">
-		<button type="button" class="icon" on:click={reload}>
-			<Refresh class="text-slate-500" />
-		</button>
-	</div>
-</div>
 
-<div class="w-full overflow-x-auto rounded-md" class:overflow-hidden={loading}>
-	<SpinnerOverlay {loading} />
-	<table class="data-table">
-		<thead>
-			<tr>
-				<th colspan="2">Requester</th>
-				<th>Amount (IDR)</th>
-				<th>Date</th>
-				<th class="w-52" />
-			</tr>
-		</thead>
-		<tbody>
+	<div class="w-full rounded-md" class:overflow-hidden={loading}>
+		<SpinnerOverlay {loading} />
+
+		<div
+			class="grid"
+			style="
+				grid-template-columns: repeat(auto-fill, minmax(min(18rem, 100%), 1fr));
+				row-gap: 1rem;
+				column-gap: .8rem;
+			"
+		>
 			{#each requests as request}
-				<tr>
-					<td>{request.customer.user.username}</td>
-					<td>({request.customer.fullname})</td>
-					<td class="text-right">{idrFormat(request.amount)}</td>
-					<td class="text-center font-mono">{request.created}</td>
-					<td>
-						<div class="flex justify-center gap-2">
-							{#if request.status === "awaiting"}
-								<button
-									class="primary"
-									on:click={() => confirmRespond("accepted", request)}
-								>
-									Accept
-								</button>
-								<button
-									class="primary variant-outline"
-									on:click={() => confirmRespond("declined", request)}
-								>
-									Decline
-								</button>
-							{:else}
-								{request.status === "accepted" ? "Accepted" : "Declined"}
-							{/if}
+				<div
+					class="
+						card flex flex-col
+						{request.response
+						? request.response.status === 'accepted'
+							? 'responded accepted'
+							: 'responded declined'
+						: 'awaiting'}
+					"
+					transition:fastSlide|local={{ axis: "Y", direction: "+" }}
+				>
+					<div class="flex flex-wrap text-slate-500 text-sm justify-between">
+						<div class="flex-grow font-mono">
+							{request.created}
 						</div>
-					</td>
-				</tr>
+						<div class="flex-grow italic  text-right whitespace-nowrap">
+							{timeAgo.format(new Date(request.created))}
+						</div>
+					</div>
+					<div class="mt-4 text-lg font-semibold">
+						@{request.customer.user.username}
+					</div>
+					<div class="mt-2 text-sm font-bold text-slate-500">BALANCE:</div>
+					<div class="font-mono text-slate-500">
+						{idrFormat(request.customer.balance)}
+					</div>
+					<hr class="my-2" />
+					<div class="flex justify-end font-mono text-md sm:text-lg">
+						<div
+							class="
+								p-2 rounded-md amount
+								{request.amount > 0 ? 'positive-amount' : 'negative-amount'}
+							"
+						>
+							{request.amount > 0
+								? "+" + idrFormat(request.amount)
+								: idrFormat(request.amount)}
+						</div>
+					</div>
+					<hr class="my-2" />
+					<div
+						style="min-height: 3rem;"
+						class="flex-grow flex items-center justify-center gap-2 flex-wrap text-center"
+					>
+						{#if !request.response}
+							<button
+								class="danger variant-outline flex items-center"
+								on:click={() => confirmRespond("declined", request)}
+							>
+								<Cross class="mr-1" /> Decline
+							</button>
+							<button
+								class="alert flex items-center"
+								on:click={() => confirmRespond("accepted", request)}
+							>
+								<Check class="mr-1" /> Accept
+							</button>
+						{:else if request.response.status === "accepted"}
+							<div class="flex items-center justify-start text-sky-600">
+								<div>
+									<Check class="mr-1" />
+								</div>
+								<div>
+									Accepted by @{request.response.responder.username}
+								</div>
+							</div>
+						{:else}
+							<div class="flex items-center text-red-500">
+								<Cross class="mr-1" /> Declined by @{request.response.responder
+									.username}
+							</div>
+						{/if}
+					</div>
+				</div>
 			{/each}
-		</tbody>
-	</table>
-</div>
+		</div>
 
-<div class="w-full my-4 flex justify-end">
-	<Pagination
-		bind:page
-		{pageSize}
-		{totalItems}
-		on:change={reload}
-		disabled={loading}
-	/>
-</div>
+		{#if requests.length < total}
+			<div class="w-full mt-4 py-6 flex justify-center text-center">
+				<button class="primary w-52 text-lg" on:click={loadNext}
+					>Load more</button
+				>
+			</div>
+		{/if}
+	</div>
+</UserLayout>
 
 <!-- Confirm verify -->
 <ConfirmDialog
@@ -206,3 +290,21 @@
 		</div>
 	{/if}
 </ConfirmDialog>
+
+<style lang="postcss">
+	.responded {
+		@apply bg-slate-50;
+	}
+	.awaiting {
+		@apply bg-amber-50 border-amber-200 hover:border-amber-300;
+	}
+	.awaiting .amount {
+		@apply text-white;
+	}
+	.awaiting .positive-amount {
+		@apply bg-emerald-600;
+	}
+	.awaiting .negative-amount {
+		@apply bg-rose-500;
+	}
+</style>
