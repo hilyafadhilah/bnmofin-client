@@ -39,7 +39,7 @@
 	import ConfirmDialog from "$components/overlay/ConfirmDialog.svelte";
 	import { session } from "$app/stores";
 	import { idrFormat, timeAgo } from "$utils/data";
-	import ViewCustomerDialog from "$components/view/ViewCustomerDialog.svelte";
+	import ViewCustomerDialog from "$root/lib/components/views/ViewCustomerDialog.svelte";
 	import type { ApiResponse } from "$models/api";
 	import SpinnerOverlay from "$components/overlay/SpinnerOverlay.svelte";
 	import Refresh from "$components/icons/Refresh.svelte";

@@ -33,8 +33,8 @@
 	import TransferFragment from "$pages/fragment/TransferFragment.svelte";
 	import Refresh from "$components/icons/Refresh.svelte";
 	import UserLayout from "$components/layouts/UserLayout.svelte";
-	import AdminTransactionCard from "$components/view/AdminTransactionCard.svelte";
-	import CustomerTransactionCard from "$components/view/CustomerTransactionCard.svelte";
+	import AdminTransactionCard from "$root/lib/components/views/AdminTransactionCard.svelte";
+	import CustomerTransactionCard from "$root/lib/components/views/CustomerTransactionCard.svelte";
 
 	let isCustomer = $session.auth?.user.role === AuthRole.Customer;
 

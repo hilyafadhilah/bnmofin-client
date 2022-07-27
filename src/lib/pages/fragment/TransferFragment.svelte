@@ -12,7 +12,7 @@
 		TransferResponse,
 	} from "$models/transaction";
 
-	import TransferDialog from "$components/view/TransferDialog.svelte";
+	import TransferDialog from "$root/lib/components/views/TransferDialog.svelte";
 	import ConfirmDialog from "$components/overlay/ConfirmDialog.svelte";
 
 	// transactions data, if any

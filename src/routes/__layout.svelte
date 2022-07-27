@@ -1,6 +1,5 @@
 <script lang="ts">
 	import "$root/app.css";
-	import Head from "$components/Head.svelte";
 	import { page } from "$app/stores";
 	import ToastContainer from "$components/feedback/ToastContainer.svelte";
 	import { toast } from "$stores/toast";
@@ -9,7 +8,9 @@
 	firebase.init();
 </script>
 
-<Head title={$page.stuff.title} />
+<svelte:head>
+	<title>{$page.stuff.title?.length ? `${$page.stuff.title?.length} | ` : ""}BNMO Wallet</title>
+</svelte:head>
 
 <slot />
 

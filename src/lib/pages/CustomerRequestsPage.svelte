@@ -5,7 +5,7 @@
 	import { api } from "$services/api";
 
 	import SpinnerOverlay from "$components/overlay/SpinnerOverlay.svelte";
-	import NewRequestDialog from "$components/view/NewRequestDialog.svelte";
+	import NewRequestDialog from "$root/lib/components/views/NewRequestDialog.svelte";
 	import Refresh from "$components/icons/Refresh.svelte";
 	import UserLayout from "$components/layouts/UserLayout.svelte";
 	import Check from "$components/icons/Check.svelte";
@@ -111,8 +111,8 @@
 
 		try {
 			const request = await api.send<
-				NewRequestPayload,
-				CustomerRequestResponse
+			NewRequestPayload,
+			CustomerRequestResponse
 			>("/request", {
 				method: "post",
 				payload,
