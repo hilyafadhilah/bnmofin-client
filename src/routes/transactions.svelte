@@ -6,67 +6,93 @@
 	import type { Load } from "@sveltejs/kit";
 	import { AuthRole, type Auth } from "$models/auth";
 
-	function fetchData(auth?: Auth, page?: number) {
+	function fetchData(auth?: Auth, skip = 0, take = 25) {
 		return api.getMany<TransactionResponse[]>("/transfer", {
 			auth,
-			page,
-			pageSize: 25,
+			skip,
+			take,
 		});
 	}
 
 	export const load: Load = async ({ session }) => {
-		const data = await fetchData(session.auth).catch(toast.forwardError());
+		const response = await fetchData(session.auth).catch(toast.forwardError());
 
 		return {
 			stuff: { title: "Transactions" },
 			props: {
-				data,
+				response,
 			},
 		};
 	};
 </script>
 
 <script lang="ts">
-	import Pagination from "$components/data/Pagination.svelte";
 	import { session } from "$app/stores";
 	import type { ApiResponse } from "$models/api";
 	import SpinnerOverlay from "$components/overlay/SpinnerOverlay.svelte";
 	import TransferFragment from "$pages/fragment/TransferFragment.svelte";
-	import { sessionManager } from "$services/session-manager";
 	import Refresh from "$components/icons/Refresh.svelte";
-	import AdminTransactionsTable from "$components/view/AdminTransactionsTable.svelte";
-	import CustomerTransactionsTable from "$components/view/CustomerTransactionsTable.svelte";
 	import UserLayout from "$components/layouts/UserLayout.svelte";
+	import AdminTransactionCard from "$components/view/AdminTransactionCard.svelte";
+	import CustomerTransactionCard from "$components/view/CustomerTransactionCard.svelte";
 
 	let isCustomer = $session.auth?.user.role === AuthRole.Customer;
 
-	export let data: ApiResponse<TransactionResponse[]> | null;
+	export let response: ApiResponse<TransactionResponse[]>;
+
 	let transactions: TransactionResponse[];
+	$: transactions = response.data;
 
-	let page: number;
-	let pageSize: number;
-	let totalItems: number;
+	let total: number;
+	$: total = response.meta.total;
 
-	$: if (data) {
-		transactions = data.data;
-		page = data.meta.page;
-		pageSize = data.meta.pageSize;
-		totalItems = data.meta.totalItems;
-	}
+	let loading = false;
 
-	const reload = () => {
-		data = null;
-		fetchData($session.auth, page)
-			.then((d) => (data = d))
-			.catch(toast.catchError());
-
-		if (isCustomer) {
-			sessionManager.refresh(session, $session);
+	const reload = async () => {
+		loading = true;
+		try {
+			response = await fetchData($session.auth);
+		} catch (err) {
+			toast.error(err);
+		} finally {
+			loading = false;
 		}
 	};
 
-	let loading: boolean;
-	$: loading = !data;
+	const loadNext = async () => {
+		loading = true;
+		try {
+			const { meta, data } = await fetchData(
+				$session.auth,
+				transactions.length
+			);
+
+			if (meta.total === total) {
+				transactions = transactions.concat(data);
+				console.log(data);
+			} else if (meta.total > total) {
+				transactions = [
+					...(await loadNew(meta.total - total)),
+					...transactions,
+					...data,
+				];
+			}
+		} catch (err) {
+			toast.error(err);
+		} finally {
+			loading = false;
+		}
+	};
+
+	const loadNew = async (take: number, skip = 0) => {
+		const { meta, data } = await fetchData($session.auth, skip, take);
+
+		if (meta.take < take) {
+			data.push(...(await loadNew(take - meta.take, skip + meta.take)));
+		}
+
+		return data;
+	};
 
 	let isTransferring = false;
 </script>
@@ -94,32 +120,36 @@
 		</div>
 	</div>
 
-	<div
-		class="w-full overflow-x-auto rounded-md"
-		class:overflow-hidden={loading}
-	>
+	<div class="w-full rounded-md" class:overflow-hidden={loading}>
 		<SpinnerOverlay {loading} />
-		{#if isCustomer && $session.auth}
-			<CustomerTransactionsTable
-				{transactions}
-				username={$session.auth.user.username}
-			/>
-		{:else}
-			<AdminTransactionsTable {transactions} />
-		{/if}
-	</div>
 
-	<div class="w-full my-4 flex justify-end">
-		<Pagination
-			bind:page
-			{pageSize}
-			{totalItems}
-			on:change={reload}
-			disabled={loading}
-		/>
+		<div
+			class="grid"
+			style="
+				grid-template-columns: repeat(auto-fill, minmax(min(18rem, 100%), 1fr));
+				row-gap: 1rem;
+				column-gap: .8rem;
+			"
+		>
+			{#each transactions as transaction}
+				{#if isCustomer && $session.auth}
+					<CustomerTransactionCard {transaction} auth={$session.auth} />
+				{:else}
+					<AdminTransactionCard {transaction} />
+				{/if}
+			{/each}
+		</div>
+
+		{#if transactions.length < total}
+			<div class="w-full mt-4 py-6 flex justify-center text-center">
+				<button class="primary w-52 text-lg" on:click={loadNext}
+					>Load more</button
+				>
+			</div>
+		{/if}
 	</div>
 </UserLayout>
 
 {#if isCustomer}
-	<TransferFragment bind:isOpen={isTransferring} bind:transactions {pageSize} />
+	<TransferFragment bind:isOpen={isTransferring} bind:transactions />
 {/if}

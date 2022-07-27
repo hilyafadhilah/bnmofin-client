@@ -46,6 +46,7 @@
 	import UserLayout from "$components/layouts/UserLayout.svelte";
 
 	export let response: ApiResponse<AdminCustomerResponse[]>;
+
 	let customers: AdminCustomerResponse[];
 	$: customers = response.data;
 
@@ -192,7 +193,7 @@
 					<hr class="my-2 -mx-2" />
 					{#if customer.status === "verified"}
 						<div
-							class="font-mono
+							class="font-mono text-right
 									{customer.balance > 0 ? 'text-emerald-500' : 'text-rose-500'}
 								"
 						>
@@ -205,8 +206,8 @@
 			{/each}
 		</div>
 		{#if customers.length < total}
-			<div class="w-full mt-4 py-2 flex justify-center text-center">
-				<button class="w-full primary text-lg" on:click={loadNext}
+			<div class="w-full mt-4 py-6 flex justify-center text-center">
+				<button class="primary w-52 text-lg" on:click={loadNext}
 					>Load more</button
 				>
 			</div>
