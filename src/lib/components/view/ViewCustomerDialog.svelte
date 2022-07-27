@@ -18,9 +18,9 @@
 
 	$: if (data) {
 		imgSrc = "";
-		getDownloadURL(ref(storage, data.idCardImage)).then(
-			(src) => (imgSrc = src)
-		);
+		getDownloadURL(ref(storage, data.idCardImage))
+			.then((src) => (imgSrc = src))
+			.catch(() => (imgSrc = "error"));
 	}
 
 	const dispatch = createEventDispatcher();

@@ -64,8 +64,8 @@ async function get<T>(endpoint: string, options?: ApiOptions) {
 export interface ApiGetManyOptions {
 	auth?: Auth;
 	query?: Record<string, unknown>;
-	page?: number;
-	pageSize?: number;
+	skip?: number;
+	take?: number;
 }
 
 async function getMany<T extends Array<any>>(
@@ -74,22 +74,20 @@ async function getMany<T extends Array<any>>(
 ) {
 	const config: AxiosRequestConfig = {};
 
-	if (options?.auth) {
-		config.headers = {
-			Authorization: `Bearer ${options.auth.token}`,
+	if (options) {
+		const { auth, query, skip, take } = options;
+
+		if (auth) {
+			config.headers = {
+				Authorization: `Bearer ${auth.token}`,
+			};
+		}
+
+		config.params = {
+			...query,
+			skip,
+			take,
 		};
-	}
-
-	if (options?.query) {
-		config.params = options.query;
-	} else {
-		config.params = {};
-	}
-
-	config.params.page = options?.page ?? 1;
-
-	if (options?.pageSize) {
-		config.params.pageSize = options.pageSize;
 	}
 
 	const { data } = await fetch.get<ApiResponse<T>>(endpoint, config);

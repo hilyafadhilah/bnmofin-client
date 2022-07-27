@@ -4,6 +4,9 @@
 	import { page } from "$app/stores";
 	import ToastContainer from "$components/feedback/ToastContainer.svelte";
 	import { toast } from "$stores/toast";
+	import { firebase } from "$services/firebase";
+
+	firebase.init();
 </script>
 
 <Head title={$page.stuff.title} />

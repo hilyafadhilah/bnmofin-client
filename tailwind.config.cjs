@@ -10,6 +10,7 @@ module.exports = {
 			fontFamily: {
 				sans: ["Inter var", ...defaultTheme.fontFamily.sans],
 				serif: ["Mali", ...defaultTheme.fontFamily.serif],
+				mono: ["Space Mono", ...defaultTheme.fontFamily.mono],
 			},
 		},
 	},

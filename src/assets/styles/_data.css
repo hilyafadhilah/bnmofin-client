@@ -14,4 +14,11 @@
 	table.data-table thead tr {
 		@apply border-gray-300;
 	}
+
+	.clickable-card {
+		@apply cursor-pointer py-2 px-2 sm:px-4 
+			rounded-md border-2 border-slate-300
+			hover:border-rose-500 hover:shadow-lg focus:outline-rose-500
+			transition-colors;
+	}
 }

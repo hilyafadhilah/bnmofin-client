@@ -7,11 +7,11 @@
 	import { AuthRole, type Auth } from "$models/auth";
 	import { UnauthorizedError } from "$models/error";
 
-	function fetchData(auth?: Auth, page?: number) {
+	function fetchData(auth?: Auth, skip = 0, take = 25) {
 		return api.getMany<AdminCustomerResponse[]>("/customer", {
 			auth,
-			page,
-			pageSize: 25,
+			skip,
+			take,
 		});
 	}
 
@@ -24,12 +24,12 @@
 			};
 		}
 
-		const data = await fetchData(session.auth).catch(toast.forwardError());
+		const response = await fetchData(session.auth).catch(toast.forwardError());
 
 		return {
 			stuff: { title: "Customers" },
 			props: {
-				data,
+				response,
 			},
 		};
 	};
@@ -38,37 +38,70 @@
 <script lang="ts">
 	import ConfirmDialog from "$components/overlay/ConfirmDialog.svelte";
 	import { session } from "$app/stores";
-	import { idrFormat } from "$utils/data";
+	import { idrFormat, timeAgo } from "$utils/data";
 	import ViewCustomerDialog from "$components/view/ViewCustomerDialog.svelte";
 	import type { ApiResponse } from "$models/api";
-	import Pagination from "$components/data/Pagination.svelte";
 	import SpinnerOverlay from "$components/overlay/SpinnerOverlay.svelte";
 	import Refresh from "$components/icons/Refresh.svelte";
 	import UserLayout from "$components/layouts/UserLayout.svelte";
 
-	export let data: ApiResponse<AdminCustomerResponse[]> | null;
+	export let response: ApiResponse<AdminCustomerResponse[]>;
 	let customers: AdminCustomerResponse[];
+	$: customers = response.data;
 
-	let page: number;
-	let pageSize: number;
-	let totalItems: number;
+	let total: number;
+	$: total = response.meta.total;
 
-	$: if (data) {
-		customers = data.data;
-		page = data.meta.page;
-		pageSize = data.meta.pageSize;
-		totalItems = data.meta.totalItems;
-	}
+	let loading = false;
 
-	const reload = () => {
-		data = null;
-		fetchData($session.auth, page)
-			.then((d) => (data = d))
-			.catch(toast.catchError());
+	const reload = async () => {
+		loading = true;
+		try {
+			response = await fetchData($session.auth);
+		} catch (err) {
+			toast.error(err);
+		} finally {
+			loading = false;
+		}
 	};
 
-	let loading: boolean;
-	$: loading = !data;
+	const loadNext = async () => {
+		loading = true;
+		try {
+			const { meta, data } = await fetchData($session.auth, customers.length);
+
+			if (meta.total === total) {
+				customers = customers.concat(data);
+				console.log(data);
+			} else if (meta.total > total) {
+				customers = [
+					...(await loadNew(meta.total - total)),
+					...customers,
+					...data,
+				];
+
+				// BUG: if there's new data during loadNew, it will be scrambled
+				// goodluck i guess. that's why they give you refresh button ;)
+			} else {
+				// handle deletion? will not be implemented, just reload the page LOL
+				// twitter dont even handle it they just say it's deleted when you open a deleted tweet
+			}
+		} catch (err) {
+			toast.error(err);
+		} finally {
+			loading = false;
+		}
+	};
+
+	const loadNew = async (take: number, skip = 0) => {
+		const { meta, data } = await fetchData($session.auth, skip, take);
+
+		if (meta.take < take) {
+			data.push(...(await loadNew(take - meta.take, skip + meta.take)));
+		}
+
+		return data;
+	};
 
 	// view
 
@@ -118,7 +151,7 @@
 
 <UserLayout>
 	<div
-		class="flex flex-wrap gap-2 justify-end my-2 pb-2 border-b border-slate-200"
+		class="flex flex-wrap gap-2 justify-end mt-2 mb-4 pb-2 border-b border-slate-200"
 	>
 		<div class="flex-grow">
 			<h2 class="font-serif">Customers</h2>
@@ -135,52 +168,49 @@
 		class:overflow-hidden={loading}
 	>
 		<SpinnerOverlay {loading} />
-		<table class="data-table">
-			<thead>
-				<tr>
-					<th>Username</th>
-					<th>Fullname</th>
-					<th>Balance</th>
-					<th>Status</th>
-					<th>Created</th>
-					<th />
-				</tr>
-			</thead>
-			<tbody>
-				{#each customers as customer}
-					<tr>
-						<td>{customer.user.username}</td>
-						<td>{customer.fullname}</td>
-						<td class="text-right"
-							>{customer.status === "verified"
-								? idrFormat(customer.balance)
-								: "-"}</td
+		<div
+			class="grid"
+			style="
+				grid-template-columns: repeat(auto-fill, minmax(min(24rem, 100%), 1fr));
+				row-gap: 1rem;
+				column-gap: .8rem;
+			"
+		>
+			{#each customers as customer}
+				<div
+					class="clickable-card"
+					class:bg-amber-50={customer.status === "unverified"}
+					class:border-amber-200={customer.status === "unverified"}
+					tabindex="0"
+					on:click={() => openDetails(customer)}
+				>
+					<div class="text-lg">@{customer.user.username}</div>
+					<div>{customer.fullname}</div>
+					<div class="text-right text-sm italic">
+						signed up {timeAgo.format(new Date(customer.created))}
+					</div>
+					<hr class="my-2 -mx-2" />
+					{#if customer.status === "verified"}
+						<div
+							class="font-mono
+									{customer.balance > 0 ? 'text-emerald-500' : 'text-rose-500'}
+								"
 						>
-						<td class="text-center">{customer.status}</td>
-						<td class="text-center font-mono">{customer.created}</td>
-						<td class="text-right">
-							<button
-								class="primary w-36"
-								class:variant-outline={customer.status === "verified"}
-								on:click={() => openDetails(customer)}
-							>
-								{customer.status === "verified" ? "View" : "View & Verify"}
-							</button>
-						</td>
-					</tr>
-				{/each}
-			</tbody>
-		</table>
-	</div>
-
-	<div class="w-full my-4 flex justify-end">
-		<Pagination
-			bind:page
-			{pageSize}
-			{totalItems}
-			on:change={reload}
-			disabled={loading}
-		/>
+							{idrFormat(customer.balance)}
+						</div>
+					{:else}
+						<div class="text-center"><i>unverified</i></div>
+					{/if}
+				</div>
+			{/each}
+		</div>
+		{#if customers.length < total}
+			<div class="w-full mt-4 py-2 flex justify-center text-center">
+				<button class="w-full primary text-lg" on:click={loadNext}
+					>Load more</button
+				>
+			</div>
+		{/if}
 	</div>
 </UserLayout>
 

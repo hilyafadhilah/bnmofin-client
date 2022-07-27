@@ -4,7 +4,7 @@ export class AppError {
 	public title: string;
 	public message: string;
 
-	constructor(err: any) {
+	constructor(err?: any) {
 		this.title = AppError.getTitle(err);
 		this.message = AppError.getMessage(err);
 	}

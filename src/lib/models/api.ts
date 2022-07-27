@@ -11,10 +11,9 @@ export interface ApiCollectionResponse<T> {
 	meta: {
 		timestamp: Date;
 		items: number;
-		totalItems: number;
-		page: number;
-		pageSize: number;
-		totalPages: number;
+		skip: number;
+		take: number;
+		total: number;
 	};
 }
 

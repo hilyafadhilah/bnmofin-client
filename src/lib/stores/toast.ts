@@ -1,6 +1,9 @@
+import { browser } from "$app/env";
+import { goto } from "$app/navigation";
 import type { ComponentType } from "svelte";
 import { writable } from "svelte/store";
 import { AppError } from "../models/error";
+import { isTokenError } from "../utils/error";
 
 export interface ToastMessage {
 	title?: string;
@@ -67,6 +70,10 @@ function createToast() {
 			variant: options?.variant,
 			duration: options?.duration,
 		});
+
+		if (isTokenError(err) && browser) {
+			goto("/logout");
+		}
 	}
 
 	function catchError(options?: ToastStyleOptions) {
