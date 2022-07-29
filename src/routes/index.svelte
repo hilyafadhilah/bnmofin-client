@@ -28,7 +28,7 @@
 	</h1>
 	<hr class="my-4" />
 	{#if $session.auth?.customer}
-		<div class="mt-4 ml-6">
+		<div class="mt-4 mx-2 md:mx-6">
 			<h4>Current Balance</h4>
 			<div class="flex">
 				<Money amount={$session.auth.customer.balance} class="text-2xl" />
@@ -36,7 +36,7 @@
 		</div>
 		<hr class="my-4" />
 	{/if}
-	<div class="w-fit mt-6 ml-6">
+	<div class="w-fit mt-6 mx-2 md:mx-6">
 		<h2 class="font-serif">Let's do something today...</h2>
 		<div class="mt-4 flex flex-col gap-2 font-serif">
 			{#if isAdmin}

@@ -40,28 +40,26 @@
 	class="md:hidden sticky top-0 mb-4 bg-gray-100 text-slate-900 drop-shadow-lg flex items-center {$$props.class}"
 >
 	<div class="w-full px-2 flex flex-row items-center">
-		<div class="h-8 sm:h-10">
-			<img src={bnmo} alt="BNMO" class="h-full w-auto" />
-		</div>
-		<div class="w-full flex items-center">
+		<a
+			href="/"
+			class="no-hover-underline flex rounded-md focus:outline-rose-500"
+		>
+			<div class="h-full">
+				<img src={bnmo} alt="BNMO" class="h-8 sm:h-10 w-auto" />
+			</div>
 			<div class="flex flex-col ml-2 font-serif">
 				<div class="text-2xl sm:text-4xl">bNM0 wAllet</div>
 			</div>
-			<!-- <nav class="hidden md:flex justify-end gap-4 flex-grow pr-4">
-				{#each links as { label, href }}
-					<a {href}>{label}</a>
-				{/each}
-			</nav> -->
-			<div class="md:hidden flex justify-end flex-grow">
-				<button
-					class="icon"
-					on:click={() => {
-						isOpen = true;
-					}}
-				>
-					<Burger />
-				</button>
-			</div>
+		</a>
+		<div class="md:hidden flex justify-end flex-grow">
+			<button
+				class="icon"
+				on:click={() => {
+					isOpen = true;
+				}}
+			>
+				<Burger />
+			</button>
 		</div>
 	</div>
 </header>
@@ -113,6 +111,7 @@
 						aria-current={isInRoute($page.url.pathname, href)
 							? "page"
 							: "false"}
+						on:click={() => (isOpen = false)}
 					>
 						<span>
 							<svelte:component this={icon} class="h-7 w-7" />
