@@ -1,14 +1,7 @@
 import TimeAgo from "javascript-time-ago";
 import en from "$root/assets/locales/timeago-en";
 
-export function idrFormat(num: number) {
-	return new Intl.NumberFormat("id-ID", {
-		style: "currency",
-		currency: "IDR",
-	}).format(num);
-}
-
-export function moneyFormat(num: number, currency: string) {
+export function moneyFormat(num: number, currency = "IDR") {
 	return new Intl.NumberFormat("id-ID", {
 		style: "currency",
 		currency,

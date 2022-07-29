@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { timeAgo } from "$root/lib/utils/data";
+	import { timeAgo } from "$utils/data";
 	import { onDestroy, onMount } from "svelte";
 
 	export let date: Date;
@@ -10,12 +10,12 @@
 	onMount(() => {
 		intervalId = setInterval(() => {
 			display = timeAgo.format(date);
-		}, 1000)
+		}, 1000);
 	});
 
 	onDestroy(() => {
-		clearInterval(intervalId)
-	})
+		clearInterval(intervalId);
+	});
 </script>
 
 {display}

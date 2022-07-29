@@ -17,7 +17,8 @@
 		if (simple) {
 			classes = amount > 0 ? "text-money-good" : "text-money-bad";
 		} else {
-			classes = " text-white " + (amount > 0 ? "bg-money-good" : "bg-money-bad");
+			classes =
+				" text-white " + (amount > 0 ? "bg-money-good" : "bg-money-bad");
 		}
 	}
 </script>

@@ -11,8 +11,8 @@ export class AppError {
 
 	static getTitle(error: any) {
 		if (axios.isAxiosError(error)) {
-			const data: any = error.response?.data
-			if (data.error?.title) {
+			const data: any = error.response?.data;
+			if (data?.error?.title) {
 				return data.error.title;
 			}
 
@@ -24,8 +24,8 @@ export class AppError {
 
 	static getMessage(error: any) {
 		if (axios.isAxiosError(error)) {
-			const data: any = error.response?.data
-			if (data.error?.message) {
+			const data: any = error.response?.data;
+			if (data?.error?.message) {
 				return data.error.message;
 			}
 

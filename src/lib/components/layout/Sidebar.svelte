@@ -4,7 +4,7 @@
 	import { AuthRole, type Auth } from "$models/auth";
 	import ChevronRight from "../icons/ChevronRight.svelte";
 	import type { ComponentType } from "svelte";
-	import { idrFormat } from "$utils/data";
+	import { moneyFormat } from "$utils/data";
 	import { isInRoute } from "$utils/component";
 	import { page } from "$app/stores";
 
@@ -55,7 +55,7 @@
 						? 'bg-emerald-600'
 						: 'bg-rose-500'}"
 				>
-					{idrFormat(auth.customer.balance)}
+					{moneyFormat(auth.customer.balance)}
 				</div>
 			{/if}
 		</div>

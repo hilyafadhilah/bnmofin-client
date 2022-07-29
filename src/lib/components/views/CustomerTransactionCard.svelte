@@ -37,6 +37,9 @@
 	{/if}
 	<hr class="my-2" />
 	<div class="flex justify-end font-mono text-lg sm:text-xl">
-		<Money amount={isSender ? -transaction.amount : transaction.amount} signed />
+		<Money
+			amount={isSender ? -transaction.amount : transaction.amount}
+			signed
+		/>
 	</div>
 </div>

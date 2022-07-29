@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { session } from "$app/stores";
-	import { idrFormat } from "$utils/data";
+	import { moneyFormat } from "$utils/data";
 	import { toast } from "$stores/toast";
 	import { api } from "$services/api";
 
@@ -110,8 +110,8 @@
 				confirmLoading = true;
 
 				const newResponse = await api.send<
-				RespondRequestPayload,
-				RespondRequestResponse
+					RespondRequestPayload,
+					RespondRequestResponse
 				>(`request/${selected.id}/response`, {
 					method: "post",
 					payload: { status: newStatus },
@@ -201,7 +201,7 @@
 					Balance:
 				</div>
 				<div class="font-mono text-slate-500">
-					{idrFormat(request.customer.balance)}
+					{moneyFormat(request.customer.balance)}
 				</div>
 				<hr class="my-2" />
 				<div class="flex justify-end font-mono text-md sm:text-lg amount">
@@ -282,7 +282,7 @@
 					<Money amount={selected.amount} abs />
 				{:else}
 					<strong class="font-mono">
-						{idrFormat(selected.amount)}
+						{moneyFormat(selected.amount)}
 					</strong>
 				{/if}
 			</div>

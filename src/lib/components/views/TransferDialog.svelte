@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { CurrenciesResponse } from "$models/money";
 	import type { TransferPayload } from "$models/transaction";
-	import { idrFormat } from "$utils/data";
+	import { moneyFormat } from "$utils/data";
 	import { createEventDispatcher } from "svelte";
 	import Money from "../data/Money.svelte";
 
@@ -47,7 +47,7 @@
 							class="ml-4 text-xl font-mono"
 							class:text-red-500={balance <= 0}
 						>
-							{idrFormat(balance)}
+							{moneyFormat(balance)}
 						</div>
 					</div>
 				{/if}

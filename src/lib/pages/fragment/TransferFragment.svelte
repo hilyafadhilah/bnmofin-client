@@ -11,10 +11,10 @@
 		TransferPayload,
 		TransferResponse,
 	} from "$models/transaction";
-	import type { CustomerCustomerResponse } from "$models/customer";
 
 	import TransferDialog from "$components/views/TransferDialog.svelte";
 	import ConfirmDialog from "$components/overlay/ConfirmDialog.svelte";
+	import Money from "$components/data/Money.svelte";
 
 	// transactions data, if any
 
@@ -52,27 +52,30 @@
 
 	reset();
 
-	// load the user
+	// confirm: load the user & amount
 
-	let receiver: CustomerCustomerResponse;
-	const getReceiver = async () => {
+	let preloaded: TransferResponse;
+
+	const confirm = async () => {
 		loading = true;
 
 		try {
-			receiver = await api.get<CustomerCustomerResponse>(
-				`/customer/${payload.username}`,
-				{ auth: $session.auth }
+			preloaded = await api.send<TransferPayload, TransferResponse>(
+				"/transfer",
+				{
+					method: "post",
+					payload,
+					auth: $session.auth,
+					query: { intent: "preload" },
+				}
 			);
+
+			showConfirm = true;
 		} catch (err) {
 			toast.error(err);
 		} finally {
 			loading = false;
 		}
-	};
-
-	const confirm = async () => {
-		await getReceiver();
-		showConfirm = true;
 	};
 
 	// action!
@@ -140,23 +143,23 @@
 	{#if payload}
 		<div class="flex flex-col text-center">
 			<div>You are about to</div>
-			<div class="text-xl">
-				<strong class="text-rose-500">SEND</strong>
+			<div class="mt-2 text-xl">
+				<strong class="text-rose-500 uppercase">send</strong>
 			</div>
-			<div class="text-2xl sm:text-3xl break-words">
-				<strong class="text-rose-500">
-					{moneyFormat(payload.money.amount, payload.money.currency)}
-				</strong>
+			<div class="mt-2 flex justify-center text-2xl sm:text-3xl">
+				<Money amount={-preloaded.amount} abs />
 			</div>
-			<div class="-mt-2 text-md sm:text-lg break-words">
-				<strong class="text-rose-500">
-					({currencies[payload.money.currency]})
-				</strong>
+			<div class="text-md sm:text-lg break-words">
+				<Money
+					amount={payload.money.amount}
+					currency={payload.money.currency}
+					unstyled
+				/>
 			</div>
 			<div>to</div>
-			<div>
-				<strong class="text-lg">@{payload.username}</strong>
-				<div class="-mt-1 text-slate-500">({receiver.fullname})</div>
+			<div class="text-slate-700">
+				<strong class="font-semibold text-xl">@{payload.username}</strong>
+				<div class="-mt-1 text-lg">({preloaded.receiver.fullname})</div>
 			</div>
 			<div class="mt-2">
 				Once you continue, you cannot take back your money.

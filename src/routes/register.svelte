@@ -14,6 +14,7 @@
 	import { api } from "$services/api";
 	import { AppError } from "$models/error";
 	import SpinnerOverlay from "$components/overlay/SpinnerOverlay.svelte";
+	import { toast } from "$stores/toast";
 
 	let username = "";
 	let password = "";
@@ -46,6 +47,10 @@
 
 	const submitHandler = async () => {
 		if (!file) {
+			toast.error({
+				title: "Invalid Input",
+				message: "Please provide an image of your ID Card.",
+			});
 			return;
 		}
 
@@ -58,6 +63,11 @@
 				idCardImage: file,
 			});
 			status = "success";
+			toast.success({
+				title: "Successful",
+				message: `Successfully signed up as @${username}. Please wait for your account to be verified.`,
+				duration: 6000,
+			});
 		} catch (err) {
 			error = new AppError(err);
 			status = "error";
@@ -71,8 +81,9 @@
 	<h3 class="mb-2">Sign Up</h3>
 	<hr class="mb-4" />
 	{#if status === "success"}
-		<div class="flex flex-col items-center">
-			<div>Successfully signed up!</div>
+		<div class="flex flex-col items-center px-6">
+			<div class="font-serif text-xl">Successfully signed up!</div>
+			<div>Please wait for your account to be verified.</div>
 			<div>
 				<a href="/login" class="text-rose-500">Click here to login</a>.
 			</div>
@@ -99,6 +110,9 @@
 					type="text"
 					bind:value={username}
 				/>
+				<div class="text-sm text-slate-600 self-end">
+					5-25 characters of alphabet, number, and underscore (_).
+				</div>
 			</FormItem>
 			<FormItem label="Password" id="register:password">
 				<input

@@ -22,6 +22,7 @@
 	} from "$models/request";
 	import type { Auth } from "$models/auth";
 	import type { CurrenciesResponse } from "$models/money";
+	import ConfirmDialog from "../components/overlay/ConfirmDialog.svelte";
 
 	export let fetchData: (
 		auth?: Auth,
@@ -93,7 +94,8 @@
 		.catch(toast.catchError());
 
 	let isRequesting = false;
-	let isSubmitting = false;
+	let showConfirm = false;
+	let dialogLoading = false;
 
 	let payload: NewRequestPayload;
 
@@ -108,13 +110,40 @@
 
 	reset();
 
+	// preload
+
+	let preloaded: CustomerRequestResponse;
+
+	const confirm = async () => {
+		dialogLoading = true;
+
+		try {
+			preloaded = await api.send<NewRequestPayload, CustomerRequestResponse>(
+				"/request",
+				{
+					method: "post",
+					payload,
+					auth: $session.auth,
+					query: { intent: "preload" },
+				}
+			);
+
+			dialogLoading = true;
+			showConfirm = true;
+		} catch (err) {
+			toast.error(err);
+		} finally {
+			dialogLoading = false;
+		}
+	};
+
 	const submitRequest = async () => {
-		isSubmitting = true;
+		dialogLoading = true;
 
 		try {
 			const request = await api.send<
-			NewRequestPayload,
-			CustomerRequestResponse
+				NewRequestPayload,
+				CustomerRequestResponse
 			>("/request", {
 				method: "post",
 				payload,
@@ -138,7 +167,7 @@
 		} catch (error) {
 			toast.error(error);
 		} finally {
-			isSubmitting = false;
+			dialogLoading = false;
 		}
 	};
 </script>
@@ -191,11 +220,11 @@
 					</div>
 				</div>
 				<hr class="my-2" />
-				<div class="flex justify-end font-mono text-md sm:text-lg">
+				<div class="flex justify-end font-mono text-md sm:text-lg amount">
 					<Money
 						amount={request.amount}
 						signed
-						unstyled={request.response?.status !== 'accepted'}
+						unstyled={request.response?.status !== "accepted"}
 					/>
 				</div>
 				<hr class="my-2" />
@@ -231,11 +260,34 @@
 
 <NewRequestDialog
 	bind:isOpen={isRequesting}
-	bind:loading={isSubmitting}
+	bind:loading={dialogLoading}
 	bind:value={payload}
 	{currencies}
-	on:submit={() => submitRequest()}
+	on:submit={() => confirm()}
 />
+
+<ConfirmDialog
+	bind:isOpen={showConfirm}
+	bind:loading={dialogLoading}
+	on:confirm={submitRequest}
+>
+	{#if payload}
+		<div class="flex flex-col text-center">
+			<div>You are about to request</div>
+			<div class="mt-2 flex justify-center text-2xl sm:text-3xl">
+				<Money amount={preloaded.amount} />
+			</div>
+			<div class="text-md sm:text-lg break-words">
+				<Money
+					amount={payload.money.amount}
+					currency={payload.money.currency}
+					simple
+				/>
+			</div>
+			<div class="mt-2">Once you continue, you cannot cancel.</div>
+		</div>
+	{/if}
+</ConfirmDialog>
 
 <style lang="postcss">
 	.accepted {
@@ -252,5 +304,11 @@
 	}
 	.pending {
 		@apply bg-slate-50;
+	}
+	.declined .amount {
+		@apply text-red-300 transition-colors;
+	}
+	.declined:hover .amount {
+		@apply text-red-600;
 	}
 </style>

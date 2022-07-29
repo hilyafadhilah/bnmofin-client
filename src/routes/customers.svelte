@@ -42,8 +42,8 @@
 	import type { ApiResponse } from "$models/api";
 	import SpinnerOverlay from "$components/overlay/SpinnerOverlay.svelte";
 	import Refresh from "$components/icons/Refresh.svelte";
-	import Money from "$root/lib/components/data/Money.svelte";
-	import TimeAgo from "$root/lib/components/data/TimeAgo.svelte";
+	import Money from "$components/data/Money.svelte";
+	import TimeAgo from "$components/data/TimeAgo.svelte";
 
 	export let response: ApiResponse<AdminCustomerResponse[]>;
 

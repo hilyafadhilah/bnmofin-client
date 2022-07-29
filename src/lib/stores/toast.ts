@@ -68,7 +68,7 @@ function createToast() {
 			title: AppError.getTitle(err),
 			message: AppError.getMessage(err),
 			variant: options?.variant,
-			duration: options?.duration,
+			duration: options?.duration ?? defaults.duration * 2,
 		});
 
 		if (isTokenError(err) && browser) {

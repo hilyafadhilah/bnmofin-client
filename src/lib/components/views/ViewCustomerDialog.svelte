@@ -87,50 +87,6 @@
 			</div>
 		</div>
 
-		<div class="px-2">
-			<!-- <table class="w-full">
-				<tr>
-					<td>Username</td>
-					<td>@{customer.user.username}</td>
-				</tr>
-				<tr>
-					<td>Fullname</td>
-					<td>{customer.fullname}</td>
-				</tr>
-				{#if admin}
-					<tr>
-						<td>Balance</td>
-						<td>{customer.status === "verified" ? idrFormat(customer.balance) : "-"}</td>
-					</tr>
-					<tr>
-						<td>Created</td>
-						<td>{customer.created}</td>
-					</tr>
-					<tr>
-						<td>Status</td>
-						<td>{customer.status}</td>
-					</tr>
-					<tr>
-						<td colspan="2">ID Card</td>
-					</tr>
-					<tr>
-						<td colspan="2" class="text-center py-4">
-							<div class="w-full h-72 mx-auto flex items-center justify-center">
-								<Image
-									src={imgSrc}
-									alt="ID Card of {customer.fullname}"
-									class="w-auto h-full mx-auto"
-									bind:loaded={imageLoaded}
-								>
-									<Spin class="h-16 w-16 absolute" />
-								</Image>
-							</div>
-						</td>
-					</tr>
-				{/if}
-			</table> -->
-		</div>
-
 		<svelte:fragment slot="actions">
 			{#if admin && customer.status === "unverified"}
 				<button
