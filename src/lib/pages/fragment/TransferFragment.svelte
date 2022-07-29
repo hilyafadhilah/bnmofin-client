@@ -11,14 +11,14 @@
 		TransferPayload,
 		TransferResponse,
 	} from "$models/transaction";
+	import type { CustomerCustomerResponse } from "$models/customer";
 
-	import TransferDialog from "$root/lib/components/views/TransferDialog.svelte";
+	import TransferDialog from "$components/views/TransferDialog.svelte";
 	import ConfirmDialog from "$components/overlay/ConfirmDialog.svelte";
 
 	// transactions data, if any
 
 	export let transactions: TransactionResponse[] | undefined = undefined;
-	export let pageSize: number | undefined = undefined;
 
 	// currencies, has fallback
 
@@ -52,7 +52,26 @@
 
 	reset();
 
-	const confirm = () => {
+	// load the user
+
+	let receiver: CustomerCustomerResponse;
+	const getReceiver = async () => {
+		loading = true;
+
+		try {
+			receiver = await api.get<CustomerCustomerResponse>(
+				`/customer/${payload.username}`,
+				{ auth: $session.auth }
+			);
+		} catch (err) {
+			toast.error(err);
+		} finally {
+			loading = false;
+		}
+	};
+
+	const confirm = async () => {
+		await getReceiver();
 		showConfirm = true;
 	};
 
@@ -81,12 +100,6 @@
 			});
 
 			isOpen = false;
-
-			if (transactions && pageSize) {
-				if (transactions.length === pageSize) {
-					transactions.pop();
-				}
-			}
 
 			if (transactions) {
 				transactions.splice(0, 0, transaction);
@@ -141,8 +154,9 @@
 				</strong>
 			</div>
 			<div>to</div>
-			<div class="lg">
-				<strong>{payload.username}</strong>
+			<div>
+				<strong class="text-lg">@{payload.username}</strong>
+				<div class="-mt-1 text-slate-500">({receiver.fullname})</div>
 			</div>
 			<div class="mt-2">
 				Once you continue, you cannot take back your money.

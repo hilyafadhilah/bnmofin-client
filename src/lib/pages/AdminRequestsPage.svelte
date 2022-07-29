@@ -6,19 +6,21 @@
 
 	import ConfirmDialog from "$components/overlay/ConfirmDialog.svelte";
 	import SpinnerOverlay from "$components/overlay/SpinnerOverlay.svelte";
-	import UserLayout from "$components/layouts/UserLayout.svelte";
 	import Refresh from "$components/icons/Refresh.svelte";
 	import Cross from "$components/icons/Cross.svelte";
 	import Check from "$components/icons/Check.svelte";
+
+	import { fastSlide } from "../transitions/fast-slide";
 
 	import type {
 		AdminRequestResponse,
 		RequestResponseStatus,
 		RespondRequestPayload,
+		RespondRequestResponse,
 	} from "$models/request";
 	import type { Auth } from "$models/auth";
 	import type { ApiResponse } from "$models/api";
-	import { fastSlide } from "../transitions/fast-slide";
+	import Money from "../components/data/Money.svelte";
 
 	export let fetchData: (
 		auth?: Auth,
@@ -46,8 +48,6 @@
 			loading = false;
 		}
 	};
-
-	$: console.log(requests);
 
 	const loadNext = async () => {
 		loading = true;
@@ -107,14 +107,14 @@
 			try {
 				confirmLoading = true;
 
-				const newResponse = await api.send<RespondRequestPayload>(
-					`request/${selected.id}/response`,
-					{
-						method: "post",
-						payload: { status: newStatus },
-						auth: $session.auth,
-					}
-				);
+				const newResponse = await api.send<
+					RespondRequestPayload,
+					RespondRequestResponse
+				>(`request/${selected.id}/response`, {
+					method: "post",
+					payload: { status: newStatus },
+					auth: $session.auth,
+				});
 
 				toast.success({
 					title: "Successful",
@@ -122,7 +122,20 @@
 				});
 
 				selected.response = newResponse;
-				requests = [...requests];
+
+				const customer = { id: selected.customerId, ...selected.customer };
+				if (newStatus === "accepted") {
+					customer.balance += selected.amount;
+				}
+
+				requests = [
+					...requests.map((req) => {
+						if (req.customerId === customer.id) {
+							req.customer.balance = customer.balance;
+						}
+						return req;
+					}),
+				];
 			} catch (err) {
 				toast.error(err);
 			} finally {
@@ -135,118 +148,115 @@
 	};
 </script>
 
-<UserLayout>
-	<div
-		class="flex flex-wrap gap-2 justify-end my-2 pb-2 border-b border-slate-200"
-	>
-		<div class="flex-grow">
-			<h2 class="font-serif">Requests</h2>
-		</div>
-		<div class="flex items-center gap-2">
-			<button type="button" class="icon" on:click={reload}>
-				<Refresh class="text-slate-500" />
-			</button>
-		</div>
+<div
+	class="flex flex-wrap gap-2 justify-end my-2 pb-2 border-b border-slate-200"
+>
+	<div class="flex-grow">
+		<h2 class="font-serif">Requests</h2>
 	</div>
+	<div class="flex items-center gap-2">
+		<button type="button" class="icon" on:click={reload}>
+			<Refresh class="text-slate-500" />
+		</button>
+	</div>
+</div>
 
-	<div class="w-full rounded-md" class:overflow-hidden={loading}>
-		<SpinnerOverlay {loading} />
+<div class="w-full rounded-md" class:overflow-hidden={loading}>
+	<SpinnerOverlay {loading} />
 
-		<div
-			class="grid"
-			style="
+	<div
+		class="grid"
+		style="
 				grid-template-columns: repeat(auto-fill, minmax(min(18rem, 100%), 1fr));
 				row-gap: 1rem;
 				column-gap: .8rem;
 			"
-		>
-			{#each requests as request}
-				<div
-					class="
+	>
+		{#each requests as request}
+			<div
+				class="
 						card flex flex-col
 						{request.response
-						? request.response.status === 'accepted'
-							? 'responded accepted'
-							: 'responded declined'
-						: 'awaiting'}
+					? request.response.status === 'accepted'
+						? 'responded accepted'
+						: 'responded declined'
+					: 'awaiting'}
 					"
-					transition:fastSlide|local={{ axis: "Y", direction: "+" }}
-				>
-					<div class="flex flex-wrap text-slate-500 text-sm justify-between">
-						<div class="flex-grow font-mono">
-							{request.created}
-						</div>
-						<div class="flex-grow italic  text-right whitespace-nowrap">
-							{timeAgo.format(new Date(request.created))}
-						</div>
+				transition:fastSlide|local={{ axis: "Y", direction: "+" }}
+			>
+				<div class="flex flex-wrap text-slate-500 text-sm justify-between">
+					<div class="flex-grow font-mono">
+						{request.created}
 					</div>
-					<div class="mt-4 text-lg font-semibold">
-						@{request.customer.user.username}
+					<div class="flex-grow italic  text-right whitespace-nowrap">
+						{timeAgo.format(new Date(request.created))}
 					</div>
-					<div class="mt-2 text-sm font-bold text-slate-500">BALANCE:</div>
-					<div class="font-mono text-slate-500">
-						{idrFormat(request.customer.balance)}
-					</div>
-					<hr class="my-2" />
-					<div class="flex justify-end font-mono text-md sm:text-lg">
-						<div
-							class="
+				</div>
+				<div class="mt-4 text-lg font-semibold">
+					@{request.customer.user.username}
+				</div>
+				<div class="mt-2 text-sm font-bold text-slate-500">BALANCE:</div>
+				<div class="font-mono text-slate-500">
+					{idrFormat(request.customer.balance)}
+				</div>
+				<hr class="my-2" />
+				<div class="flex justify-end font-mono text-md sm:text-lg">
+					<div
+						class="
 								p-2 rounded-md amount
 								{request.amount > 0 ? 'positive-amount' : 'negative-amount'}
 							"
-						>
-							{request.amount > 0
-								? "+" + idrFormat(request.amount)
-								: idrFormat(request.amount)}
-						</div>
-					</div>
-					<hr class="my-2" />
-					<div
-						style="min-height: 3rem;"
-						class="flex-grow flex items-center justify-center gap-2 flex-wrap text-center"
 					>
-						{#if !request.response}
-							<button
-								class="danger variant-outline flex items-center"
-								on:click={() => confirmRespond("declined", request)}
-							>
-								<Cross class="mr-1" /> Decline
-							</button>
-							<button
-								class="alert flex items-center"
-								on:click={() => confirmRespond("accepted", request)}
-							>
-								<Check class="mr-1" /> Accept
-							</button>
-						{:else if request.response.status === "accepted"}
-							<div class="flex items-center justify-start text-sky-600">
-								<div>
-									<Check class="mr-1" />
-								</div>
-								<div>
-									Accepted by @{request.response.responder.username}
-								</div>
-							</div>
-						{:else}
-							<div class="flex items-center text-red-500">
-								<Cross class="mr-1" /> Declined by @{request.response.responder
-									.username}
-							</div>
-						{/if}
+						{request.amount > 0
+							? "+" + idrFormat(request.amount)
+							: idrFormat(request.amount)}
 					</div>
 				</div>
-			{/each}
-		</div>
-
-		{#if requests.length < total}
-			<div class="w-full mt-4 py-6 flex justify-center text-center">
-				<button class="primary w-52 text-lg" on:click={loadNext}
-					>Load more</button
+				<hr class="my-2" />
+				<div
+					style="min-height: 3rem;"
+					class="flex-grow flex items-center justify-center gap-2 flex-wrap text-center"
 				>
+					{#if !request.response}
+						<button
+							class="danger variant-outline flex items-center"
+							on:click={() => confirmRespond("declined", request)}
+						>
+							<Cross class="mr-1" /> Decline
+						</button>
+						<button
+							class="alert flex items-center"
+							on:click={() => confirmRespond("accepted", request)}
+						>
+							<Check class="mr-1" /> Accept
+						</button>
+					{:else if request.response.status === "accepted"}
+						<div class="flex items-center justify-start text-sky-600">
+							<div>
+								<Check class="mr-1" />
+							</div>
+							<div>
+								Accepted by @{request.response.responder.username}
+							</div>
+						</div>
+					{:else}
+						<div class="flex items-center text-red-500">
+							<Cross class="mr-1" /> Declined by @{request.response.responder
+								.username}
+						</div>
+					{/if}
+				</div>
 			</div>
-		{/if}
+		{/each}
 	</div>
-</UserLayout>
+
+	{#if requests.length < total}
+		<div class="w-full mt-4 py-6 flex justify-center text-center">
+			<button class="primary w-52 text-lg" on:click={loadNext}>Load more</button
+			>
+		</div>
+	{/if}
+</div>
 
 <!-- Confirm verify -->
 <ConfirmDialog
@@ -257,34 +267,38 @@
 	{#if selected && newStatus}
 		<div class="flex flex-col text-center">
 			<div>You are about to</div>
-			<div class="text-xl">
+			<div class="mt-2 text-xl uppercase">
 				{#if newStatus === "accepted"}
-					<strong class="text-emerald-500">GIVE</strong>
+					{#if selected.amount > 0}
+						<strong class="text-money-good">give</strong>
+					{:else}
+						<strong class="text-money-bad">take</strong>
+					{/if}
 				{:else}
-					<strong class="text-rose-500">REJECT</strong>
+					<strong>decline</strong>
 				{/if}
 			</div>
-			<div class="text-2xl sm:text-3xl break-words">
+			<div class="mb-4 flex justify-center text-2xl sm:text-3xl break-words">
 				{#if newStatus === "accepted"}
-					<strong class="text-emerald-500">
-						{idrFormat(selected.amount)}
-					</strong>
+					<Money amount={selected.amount} abs />
 				{:else}
-					<strong class="text-rose-500">
+					<strong class="font-mono">
 						{idrFormat(selected.amount)}
 					</strong>
 				{/if}
 			</div>
-			<div>
-				{newStatus === "accepted" ? "to" : "from"}
+			<div class="text-slate-500 uppercase font-bold">
+				{newStatus === "accepted" && selected.amount > 0 ? "to" : "from"}
 			</div>
 			<div class="lg">
-				<strong
-					>{selected.customer.user.username} ({selected.customer
-						.fullname})</strong
-				>
+				<div class="text-xl font-semibold">
+					@{selected.customer.user.username}
+				</div>
+				<div class="text-sm">
+					({selected.customer.fullname})
+				</div>
 			</div>
-			<div class="mt-2">
+			<div class="mt-6">
 				Once you continue, you cannot change your decision.
 			</div>
 		</div>

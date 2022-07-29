@@ -14,7 +14,6 @@
 	import SpinnerOverlay from "$components/overlay/SpinnerOverlay.svelte";
 	import { session } from "$app/stores";
 	import { sessionManager } from "$services/session-manager";
-	import GuestLayout from "$components/layouts/GuestLayout.svelte";
 	import { toast } from "$stores/toast";
 	import { goto } from "$app/navigation";
 
@@ -46,29 +45,27 @@
 	};
 </script>
 
-<GuestLayout>
-	<SpinnerOverlay {loading} />
+<SpinnerOverlay {loading} />
 
-	<div>
-		<h3 class="mb-2">Login</h3>
-		<hr class="mb-4" />
-		{#if error}
-			<div class="flex flex-col items-center text-red-500">
-				<div class="font-serif font-bold">{error.title}</div>
-				<div class="text-sm">{error.message}</div>
-			</div>
-			<hr class="mt-2 mb-4" />
-		{/if}
-		<form on:submit={submitHandler}>
-			<div class="flex flex-col">
-				<FormItem label="Username" id="login:username">
-					<input id="login:username" bind:value={username} />
-				</FormItem>
-				<FormItem label="Password" id="login:password">
-					<input id="login:password" type="password" bind:value={password} />
-				</FormItem>
-				<button type="submit" class="primary mt-2"> Submit </button>
-			</div>
-		</form>
-	</div>
-</GuestLayout>
+<div>
+	<h3 class="mb-2">Login</h3>
+	<hr class="mb-4" />
+	{#if error}
+		<div class="flex flex-col items-center text-red-500">
+			<div class="font-serif font-bold">{error.title}</div>
+			<div class="text-sm">{error.message}</div>
+		</div>
+		<hr class="mt-2 mb-4" />
+	{/if}
+	<form on:submit={submitHandler}>
+		<div class="flex flex-col">
+			<FormItem label="Username" id="login:username">
+				<input id="login:username" bind:value={username} />
+			</FormItem>
+			<FormItem label="Password" id="login:password">
+				<input id="login:password" type="password" bind:value={password} />
+			</FormItem>
+			<button type="submit" class="primary mt-2"> Submit </button>
+		</div>
+	</form>
+</div>

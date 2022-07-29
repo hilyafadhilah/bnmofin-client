@@ -4,11 +4,12 @@
 	import Drawer from "$components/overlay/Drawer.svelte";
 	import bnmo from "$root/assets/images/bnmo.png";
 	import { browser } from "$app/env";
-	import Overlay from "../overlay/Overlay.svelte";
+	import Overlay from "$components/overlay/Overlay.svelte";
 	import type { ComponentType } from "svelte";
 	import { AuthRole, type Auth } from "$models/auth";
 	import { idrFormat } from "$utils/data";
-	import { isNavCurrent } from "$utils/component";
+	import { isInRoute } from "$utils/component";
+	import { page } from "$app/stores";
 
 	export let auth: Auth;
 	export let links: Array<{ href: string; label: string; icon: ComponentType }>;
@@ -107,9 +108,11 @@
 						{href}
 						class="
 							p-1 rounded-md flex gap-2 hover:bg-slate-200 focus:outline-teal-500
-							{isNavCurrent(href) ? 'text-rose-500' : 'text-slate-800'}
+							{isInRoute($page.url.pathname, href) ? 'text-rose-500' : 'text-slate-800'}
 						"
-						aria-current={isNavCurrent(href) ? "page" : "false"}
+						aria-current={isInRoute($page.url.pathname, href)
+							? "page"
+							: "false"}
 					>
 						<span>
 							<svelte:component this={icon} class="h-7 w-7" />

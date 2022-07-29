@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { TransactionResponse } from "$models/transaction";
-	import { idrFormat, timeAgo } from "$utils/data";
+	import { timeAgo } from "$utils/data";
+	import Money from "../data/Money.svelte";
 
 	export let transaction: TransactionResponse;
 </script>
@@ -15,17 +16,19 @@
 		</div>
 	</div>
 	<div class="mt-4">
-		<div class="font-bold text-slate-500 text-sm">FROM</div>
-		<div class="text-xl">@{transaction.sender.user.username}</div>
+		<div class="font-bold text-slate-500 text-sm uppercase">From</div>
+		<div class="text-xl font-semibold text-slate-700">
+			@{transaction.sender.user.username}
+		</div>
 	</div>
 	<div class="mt-2">
-		<div class="font-bold text-slate-500 text-sm">TO</div>
-		<div class="text-xl">@{transaction.receiver.user.username}</div>
+		<div class="font-bold text-slate-500 text-sm uppercase">To</div>
+		<div class="text-xl font-semibold text-slate-700">
+			@{transaction.receiver.user.username}
+		</div>
 	</div>
 	<hr class="my-2" />
 	<div class="flex justify-end font-mono text-lg sm:text-xl">
-		<div class="p-2 rounded-md text-emerald-700">
-			{idrFormat(transaction.amount)}
-		</div>
+		<Money amount={transaction.amount} simple />
 	</div>
 </div>

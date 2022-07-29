@@ -14,7 +14,6 @@
 	import { api } from "$services/api";
 	import { AppError } from "$models/error";
 	import SpinnerOverlay from "$components/overlay/SpinnerOverlay.svelte";
-	import GuestLayout from "$components/layouts/GuestLayout.svelte";
 
 	let username = "";
 	let password = "";
@@ -66,89 +65,87 @@
 	};
 </script>
 
-<GuestLayout>
-	<SpinnerOverlay loading={status === "loading"} />
+<SpinnerOverlay loading={status === "loading"} />
 
-	<div>
-		<h3 class="mb-2">Sign Up</h3>
-		<hr class="mb-4" />
-		{#if status === "success"}
-			<div class="flex flex-col items-center">
-				<div>Successfully signed up!</div>
-				<div>
-					<a href="/login" class="text-rose-500">Click here to login</a>.
-				</div>
-			</div>
-		{/if}
-
-		<!--
-			must use hidden class to prevent rerendering
-			@see https://stackoverflow.com/a/42777812
-		-->
-		<div class:hidden={status === "success"}>
-			{#if error}
-				<div class="flex flex-col items-center text-red-500">
-					<div class="font-serif font-bold">{error.title}</div>
-					<div class="text-sm">{error.message}</div>
-				</div>
-				<hr class="mt-2 mb-4" />
-			{/if}
-			<div class="flex flex-col">
-				<FormItem label="Username" id="register:username">
-					<input
-						id="register:username"
-						name="username"
-						type="text"
-						bind:value={username}
-					/>
-				</FormItem>
-				<FormItem label="Password" id="register:password">
-					<input
-						id="register:password"
-						name="password"
-						type="password"
-						bind:value={password}
-					/>
-				</FormItem>
-				<FormItem label="Fullname" id="register:fullname">
-					<input
-						id="register:fullname"
-						name="fullname"
-						type="text"
-						bind:value={fullname}
-					/>
-				</FormItem>
-				<FormItem id="register:idCardImage" label="ID Card Image">
-					<input
-						id="register:idCardImage"
-						name="idCardImage"
-						type="file"
-						accept="image/jpeg, image/png, image/gif"
-						bind:files
-						on:change={fileChangeHandler}
-					/>
-					<div
-						class="text-sm text-slate-600 self-end"
-						class:text-red-500={size > maxSize}
-					>
-						{#if !file}
-							Maximum 5 MB.
-						{:else}
-							{getReadableFileSize(size)} / 5 MB.
-						{/if}
-					</div>
-				</FormItem>
-				{#if imgUrl}
-					<div>
-						<img
-							src={imgUrl}
-							alt="Chosen ID Card"
-							class="max-w-xs max-h-48 mx-auto"
-						/>
-					</div>
-				{/if}
-				<button class="primary mt-2" on:click={submitHandler}> Submit </button>
+<div>
+	<h3 class="mb-2">Sign Up</h3>
+	<hr class="mb-4" />
+	{#if status === "success"}
+		<div class="flex flex-col items-center">
+			<div>Successfully signed up!</div>
+			<div>
+				<a href="/login" class="text-rose-500">Click here to login</a>.
 			</div>
 		</div>
+	{/if}
+
+	<!--
+		must use hidden class to prevent rerendering
+		@see https://stackoverflow.com/a/42777812
+	-->
+	<div class:hidden={status === "success"}>
+		{#if error}
+			<div class="flex flex-col items-center text-red-500">
+				<div class="font-serif font-bold">{error.title}</div>
+				<div class="text-sm">{error.message}</div>
+			</div>
+			<hr class="mt-2 mb-4" />
+		{/if}
+		<div class="flex flex-col">
+			<FormItem label="Username" id="register:username">
+				<input
+					id="register:username"
+					name="username"
+					type="text"
+					bind:value={username}
+				/>
+			</FormItem>
+			<FormItem label="Password" id="register:password">
+				<input
+					id="register:password"
+					name="password"
+					type="password"
+					bind:value={password}
+				/>
+			</FormItem>
+			<FormItem label="Fullname" id="register:fullname">
+				<input
+					id="register:fullname"
+					name="fullname"
+					type="text"
+					bind:value={fullname}
+				/>
+			</FormItem>
+			<FormItem id="register:idCardImage" label="ID Card Image">
+				<input
+					id="register:idCardImage"
+					name="idCardImage"
+					type="file"
+					accept="image/jpeg, image/png, image/gif"
+					bind:files
+					on:change={fileChangeHandler}
+				/>
+				<div
+					class="text-sm text-slate-600 self-end"
+					class:text-red-500={size > maxSize}
+				>
+					{#if !file}
+						Maximum 5 MB.
+					{:else}
+						{getReadableFileSize(size)} / 5 MB.
+					{/if}
+				</div>
+			</FormItem>
+			{#if imgUrl}
+				<div>
+					<img
+						src={imgUrl}
+						alt="Chosen ID Card"
+						class="max-w-xs max-h-48 mx-auto"
+					/>
+				</div>
+			{/if}
+			<button class="primary mt-2" on:click={submitHandler}> Submit </button>
+		</div>
 	</div>
-</GuestLayout>
+</div>

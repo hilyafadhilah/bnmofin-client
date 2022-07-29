@@ -1,8 +1,7 @@
 <script lang="ts">
 	import "$root/app.css";
 	import Topbar from "$components/layout/Topbar.svelte";
-	import { browser } from "$app/env";
-	import { afterNavigate, goto } from "$app/navigation";
+	import { afterNavigate } from "$app/navigation";
 	import { session } from "$app/stores";
 	import { toast } from "$stores/toast";
 	import { AuthRole } from "$models/auth";
@@ -13,10 +12,6 @@
 	import SwitchHorizontal from "../icons/SwitchHorizontal.svelte";
 	import Inbox from "../icons/Inbox.svelte";
 	import Logout from "../icons/Logout.svelte";
-
-	$: if (browser && !$session.auth) {
-		goto("/login");
-	}
 
 	let navigationLinks = [
 		{ href: "/", label: "Home", icon: Home },
@@ -52,13 +47,13 @@
 	<Topbar class="h-14" auth={$session.auth} links={navigationLinks} />
 
 	<div
-		class="flex px-4 md:px-6 lg:px-8 py-4 gap-4 lg:gap-8 items-start"
+		class="flex mx-auto px-4 md:px-6 lg:px-8 py-4 gap-4 lg:gap-8 items-start"
 		style="max-width: 1920px;"
 	>
 		<Sidebar auth={$session.auth} links={navigationLinks} />
 
 		<main
-			class="flex-grow bg-white py-6 px-6 sm:px-6 lg:px-8 overflow-auto rounded-2xl drop-shadow-md"
+			class="flex-grow bg-white py-6 px-6 sm:px-6 lg:px-8 overflow-auto rounded-2xl shadow-md"
 		>
 			<slot />
 		</main>

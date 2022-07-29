@@ -5,7 +5,8 @@
 	import ChevronRight from "../icons/ChevronRight.svelte";
 	import type { ComponentType } from "svelte";
 	import { idrFormat } from "$utils/data";
-	import { isNavCurrent } from "$utils/component";
+	import { isInRoute } from "$utils/component";
+	import { page } from "$app/stores";
 
 	export let auth: Auth;
 	export let links: Array<{ href: string; label: string; icon: ComponentType }>;
@@ -51,7 +52,7 @@
 				<div
 					class="px-2 mt-2 rounded-sm whitespace-nowrap font-mono text-white {auth
 						.customer.balance > 0
-						? 'bg-emerald-500'
+						? 'bg-emerald-600'
 						: 'bg-rose-500'}"
 				>
 					{idrFormat(auth.customer.balance)}
@@ -66,9 +67,9 @@
 					class:justify-center={!expanded}
 					class="
 						p-1 rounded-md flex gap-2 hover:bg-slate-200 focus:outline-teal-500
-						{isNavCurrent(href) ? 'text-rose-500' : 'text-slate-800'}
+						{isInRoute($page.url.pathname, href) ? 'text-rose-500' : 'text-slate-800'}
 					"
-					aria-current={isNavCurrent(href) ? "page" : "false"}
+					aria-current={isInRoute($page.url.pathname, href) ? "page" : "false"}
 				>
 					<span>
 						<svelte:component this={icon} class="h-7 w-7" />

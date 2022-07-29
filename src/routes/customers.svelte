@@ -39,11 +39,10 @@
 	import ConfirmDialog from "$components/overlay/ConfirmDialog.svelte";
 	import { session } from "$app/stores";
 	import { idrFormat, timeAgo } from "$utils/data";
-	import ViewCustomerDialog from "$root/lib/components/views/ViewCustomerDialog.svelte";
+	import ViewCustomerDialog from "$components/views/ViewCustomerDialog.svelte";
 	import type { ApiResponse } from "$models/api";
 	import SpinnerOverlay from "$components/overlay/SpinnerOverlay.svelte";
 	import Refresh from "$components/icons/Refresh.svelte";
-	import UserLayout from "$components/layouts/UserLayout.svelte";
 
 	export let response: ApiResponse<AdminCustomerResponse[]>;
 
@@ -73,7 +72,6 @@
 
 			if (meta.total === total) {
 				customers = customers.concat(data);
-				console.log(data);
 			} else if (meta.total > total) {
 				customers = [
 					...(await loadNew(meta.total - total)),
@@ -150,70 +148,64 @@
 	};
 </script>
 
-<UserLayout>
-	<div
-		class="flex flex-wrap gap-2 justify-end mt-2 mb-4 pb-2 border-b border-slate-200"
-	>
-		<div class="flex-grow">
-			<h2 class="font-serif">Customers</h2>
-		</div>
-		<div class="flex items-center gap-2">
-			<button type="button" class="icon" on:click={reload}>
-				<Refresh class="text-slate-500" />
-			</button>
-		</div>
+<div
+	class="flex flex-wrap gap-2 justify-end mt-2 mb-4 pb-2 border-b border-slate-200"
+>
+	<div class="flex-grow">
+		<h2 class="font-serif">Customers</h2>
 	</div>
+	<div class="flex items-center gap-2">
+		<button type="button" class="icon" on:click={reload}>
+			<Refresh class="text-slate-500" />
+		</button>
+	</div>
+</div>
 
+<div class="w-full overflow-x-auto rounded-md" class:overflow-hidden={loading}>
+	<SpinnerOverlay {loading} />
 	<div
-		class="w-full overflow-x-auto rounded-md"
-		class:overflow-hidden={loading}
-	>
-		<SpinnerOverlay {loading} />
-		<div
-			class="grid"
-			style="
+		class="grid"
+		style="
 				grid-template-columns: repeat(auto-fill, minmax(min(18rem, 100%), 1fr));
 				row-gap: 1rem;
 				column-gap: .8rem;
 			"
-		>
-			{#each customers as customer}
-				<div
-					class="clickable-card"
-					class:bg-amber-50={customer.status === "unverified"}
-					class:border-amber-200={customer.status === "unverified"}
-					tabindex="0"
-					on:click={() => openDetails(customer)}
-				>
-					<div class="text-xl font-semibold">@{customer.user.username}</div>
-					<div>{customer.fullname}</div>
-					<div class="text-right text-sm italic text-slate-500">
-						signed up {timeAgo.format(new Date(customer.created))}
-					</div>
-					<hr class="my-2 -mx-2" />
-					{#if customer.status === "verified"}
-						<div
-							class="font-mono text-right
+	>
+		{#each customers as customer}
+			<div
+				class="clickable-card"
+				class:bg-amber-50={customer.status === "unverified"}
+				class:border-amber-200={customer.status === "unverified"}
+				tabindex="0"
+				on:click={() => openDetails(customer)}
+			>
+				<div class="text-xl font-semibold">@{customer.user.username}</div>
+				<div>{customer.fullname}</div>
+				<div class="text-right text-sm italic text-slate-500">
+					signed up {timeAgo.format(new Date(customer.created))}
+				</div>
+				<hr class="my-2 -mx-2" />
+				{#if customer.status === "verified"}
+					<div
+						class="font-mono text-right
 									{customer.balance > 0 ? 'text-emerald-500' : 'text-rose-500'}
 								"
-						>
-							{idrFormat(customer.balance)}
-						</div>
-					{:else}
-						<div class="text-center"><i>unverified</i></div>
-					{/if}
-				</div>
-			{/each}
-		</div>
-		{#if customers.length < total}
-			<div class="w-full mt-4 py-6 flex justify-center text-center">
-				<button class="primary w-52 text-lg" on:click={loadNext}
-					>Load more</button
-				>
+					>
+						{idrFormat(customer.balance)}
+					</div>
+				{:else}
+					<div class="text-center"><i>unverified</i></div>
+				{/if}
 			</div>
-		{/if}
+		{/each}
 	</div>
-</UserLayout>
+	{#if customers.length < total}
+		<div class="w-full mt-4 py-6 flex justify-center text-center">
+			<button class="primary w-52 text-lg" on:click={loadNext}>Load more</button
+			>
+		</div>
+	{/if}
+</div>
 
 <!-- View Details -->
 {#if selected}
@@ -232,9 +224,18 @@
 	on:confirm={verify}
 >
 	<div class="flex flex-col text-center">
+		<div>You are about to</div>
+		<div class="mt-2 text-xl uppercase font-bold">verify</div>
 		<div>
-			You are about to verify <strong>{selected?.fullname}</strong>.
+			<div class="text-2xl font-semibold">
+				@{selected?.user.username}
+			</div>
+			<div class="text-sm">
+				({selected?.fullname})
+			</div>
 		</div>
-		<div>Once you verify, you cannot unverify.</div>
+		<div class="mt-6">
+			Once you verify, you <strong>cannot unverify</strong>.
+		</div>
 	</div>
 </ConfirmDialog>

@@ -28,7 +28,11 @@
 	}
 
 	a {
-		@apply cursor-pointer hover:underline;
+		@apply cursor-pointer;
+	}
+
+	a:not(.no-hover-underline) {
+		@apply hover:underline;
 	}
 
 	input,

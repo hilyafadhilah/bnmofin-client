@@ -32,9 +32,8 @@
 	import SpinnerOverlay from "$components/overlay/SpinnerOverlay.svelte";
 	import TransferFragment from "$pages/fragment/TransferFragment.svelte";
 	import Refresh from "$components/icons/Refresh.svelte";
-	import UserLayout from "$components/layouts/UserLayout.svelte";
-	import AdminTransactionCard from "$root/lib/components/views/AdminTransactionCard.svelte";
-	import CustomerTransactionCard from "$root/lib/components/views/CustomerTransactionCard.svelte";
+	import AdminTransactionCard from "$components/views/AdminTransactionCard.svelte";
+	import CustomerTransactionCard from "$components/views/CustomerTransactionCard.svelte";
 
 	let isCustomer = $session.auth?.user.role === AuthRole.Customer;
 
@@ -96,58 +95,56 @@
 	let isTransferring = false;
 </script>
 
-<UserLayout>
-	<div
-		class="flex flex-wrap gap-2 justify-end my-2 pb-2 border-b border-slate-200"
-	>
-		<div class="flex-grow">
-			<h2 class="font-serif">
-				{isCustomer ? "Transaction History" : "Transactions"}
-			</h2>
-		</div>
-		<div class="flex items-center gap-2">
-			<button type="button" class="icon" on:click={reload}>
-				<Refresh class="text-slate-500" />
-			</button>
-			{#if isCustomer}
-				<button
-					type="button"
-					class="primary"
-					on:click={() => (isTransferring = true)}>Transfer</button
-				>
-			{/if}
-		</div>
+<div
+	class="flex flex-wrap gap-2 justify-end my-2 pb-2 border-b border-slate-200"
+>
+	<div class="flex-grow">
+		<h2 class="font-serif">
+			{isCustomer ? "Transaction History" : "Transactions"}
+		</h2>
 	</div>
+	<div class="flex items-center gap-2">
+		<button type="button" class="icon" on:click={reload}>
+			<Refresh class="text-slate-500" />
+		</button>
+		{#if $session.auth?.customer}
+			<button
+				type="button"
+				class="primary"
+				disabled={$session.auth.customer.balance <= 0}
+				on:click={() => (isTransferring = true)}>Transfer</button
+			>
+		{/if}
+	</div>
+</div>
 
-	<div class="w-full rounded-md" class:overflow-hidden={loading}>
-		<SpinnerOverlay {loading} />
+<div class="w-full rounded-md" class:overflow-hidden={loading}>
+	<SpinnerOverlay {loading} />
 
-		<div
-			class="grid"
-			style="
+	<div
+		class="grid"
+		style="
 				grid-template-columns: repeat(auto-fill, minmax(min(18rem, 100%), 1fr));
 				row-gap: 1rem;
 				column-gap: .8rem;
 			"
-		>
-			{#each transactions as transaction}
-				{#if isCustomer && $session.auth}
-					<CustomerTransactionCard {transaction} auth={$session.auth} />
-				{:else}
-					<AdminTransactionCard {transaction} />
-				{/if}
-			{/each}
-		</div>
-
-		{#if transactions.length < total}
-			<div class="w-full mt-4 py-6 flex justify-center text-center">
-				<button class="primary w-52 text-lg" on:click={loadNext}
-					>Load more</button
-				>
-			</div>
-		{/if}
+	>
+		{#each transactions as transaction}
+			{#if isCustomer && $session.auth}
+				<CustomerTransactionCard {transaction} auth={$session.auth} />
+			{:else}
+				<AdminTransactionCard {transaction} />
+			{/if}
+		{/each}
 	</div>
-</UserLayout>
+
+	{#if transactions.length < total}
+		<div class="w-full mt-4 py-6 flex justify-center text-center">
+			<button class="primary w-52 text-lg" on:click={loadNext}>Load more</button
+			>
+		</div>
+	{/if}
+</div>
 
 {#if isCustomer}
 	<TransferFragment bind:isOpen={isTransferring} bind:transactions />

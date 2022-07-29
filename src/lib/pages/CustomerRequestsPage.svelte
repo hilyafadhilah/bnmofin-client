@@ -5,9 +5,8 @@
 	import { api } from "$services/api";
 
 	import SpinnerOverlay from "$components/overlay/SpinnerOverlay.svelte";
-	import NewRequestDialog from "$root/lib/components/views/NewRequestDialog.svelte";
+	import NewRequestDialog from "$components/views/NewRequestDialog.svelte";
 	import Refresh from "$components/icons/Refresh.svelte";
-	import UserLayout from "$components/layouts/UserLayout.svelte";
 	import Check from "$components/icons/Check.svelte";
 	import Cross from "$components/icons/Cross.svelte";
 
@@ -132,110 +131,105 @@
 			requests = [...requests];
 
 			reset();
+			isRequesting = false;
 		} catch (error) {
 			toast.error(error);
 		} finally {
 			isSubmitting = false;
-			isRequesting = false;
 		}
 	};
 </script>
 
-<UserLayout>
-	<div
-		class="flex flex-wrap gap-2 justify-end my-2 pb-2 border-b border-slate-200"
-	>
-		<div class="flex-grow">
-			<h2 class="font-serif">Requests</h2>
-		</div>
-		<div class="flex items-center gap-2">
-			<button type="button" class="icon" on:click={reload}>
-				<Refresh class="text-slate-500" />
-			</button>
-			<button
-				type="button"
-				class="primary"
-				on:click={() => (isRequesting = true)}>Issue New Request</button
-			>
-		</div>
+<div
+	class="flex flex-wrap gap-2 justify-end my-2 pb-2 border-b border-slate-200"
+>
+	<div class="flex-grow">
+		<h2 class="font-serif">Requests</h2>
 	</div>
+	<div class="flex items-center gap-2">
+		<button type="button" class="icon" on:click={reload}>
+			<Refresh class="text-slate-500" />
+		</button>
+		<button type="button" class="primary" on:click={() => (isRequesting = true)}
+			>Send New Request</button
+		>
+	</div>
+</div>
 
-	<div class="w-full rounded-md" class:overflow-hidden={loading}>
-		<SpinnerOverlay {loading} />
+<div class="w-full rounded-md" class:overflow-hidden={loading}>
+	<SpinnerOverlay {loading} />
 
-		<div
-			class="grid"
-			style="
+	<div
+		class="grid"
+		style="
 				grid-template-columns: repeat(auto-fill, minmax(min(18rem, 100%), 1fr));
 				row-gap: 1rem;
 				column-gap: .8rem;
 			"
-		>
-			{#each requests as request}
-				<div
-					class="
+	>
+		{#each requests as request}
+			<div
+				class="
 						card flex flex-col
 						{request.response
-						? request.response.status === 'accepted'
-							? 'responded accepted'
-							: 'responded declined'
-						: 'pending'}
+					? request.response.status === 'accepted'
+						? 'responded accepted'
+						: 'responded declined'
+					: 'pending'}
 					"
-					transition:fastSlide|local={{ axis: "Y", direction: "+" }}
-				>
-					<div class="flex flex-wrap text-slate-500 text-sm justify-between">
-						<div class="flex-grow font-mono">
-							{request.created}
-						</div>
-						<div class="flex-grow italic  text-right whitespace-nowrap">
-							{timeAgo.format(new Date(request.created))}
-						</div>
+				transition:fastSlide|local={{ axis: "Y", direction: "+" }}
+			>
+				<div class="flex flex-wrap text-slate-500 text-sm justify-between">
+					<div class="flex-grow font-mono">
+						{request.created}
 					</div>
-					<hr class="my-2" />
-					<div class="flex justify-end font-mono text-md sm:text-lg">
-						<div
-							class="
+					<div class="flex-grow italic  text-right whitespace-nowrap">
+						{timeAgo.format(new Date(request.created))}
+					</div>
+				</div>
+				<hr class="my-2" />
+				<div class="flex justify-end font-mono text-md sm:text-lg">
+					<div
+						class="
 								p-2 rounded-md amount
 								{request.amount > 0 ? 'positive-amount' : 'negative-amount'}
 							"
-						>
-							{request.amount > 0
-								? "+" + idrFormat(request.amount)
-								: idrFormat(request.amount)}
-						</div>
-					</div>
-					<hr class="my-2" />
-					<div
-						style="min-height: 3rem;"
-						class="flex-grow flex items-center justify-center gap-2 flex-wrap text-center"
 					>
-						{#if !request.response}
-							<div class="flex items-center justify-start text-slate-500">
-								Pending
-							</div>
-						{:else if request.response.status === "accepted"}
-							<div class="flex items-center justify-start text-sky-600">
-								<Check class="mr-1" /> Accepted
-							</div>
-						{:else}
-							<div class="flex items-center text-red-500">
-								<Cross class="mr-1" /> Declined
-							</div>
-						{/if}
+						{request.amount > 0
+							? "+" + idrFormat(request.amount)
+							: idrFormat(request.amount)}
 					</div>
 				</div>
-			{/each}
-		</div>
-
-		{#if requests.length < total}
-			<div class="w-full mt-4 py-6 flex justify-center text-center">
-				<button class="primary w-52 text-lg" on:click={loadNext}
-					>Load more</button
+				<hr class="my-2" />
+				<div
+					style="min-height: 3rem;"
+					class="flex-grow flex items-center justify-center gap-2 flex-wrap text-center"
 				>
+					{#if !request.response}
+						<div class="flex items-center justify-start text-slate-500">
+							Pending
+						</div>
+					{:else if request.response.status === "accepted"}
+						<div class="flex items-center justify-start text-sky-600">
+							<Check class="mr-1" /> Accepted
+						</div>
+					{:else}
+						<div class="flex items-center text-red-500">
+							<Cross class="mr-1" /> Declined
+						</div>
+					{/if}
+				</div>
 			</div>
-		{/if}
+		{/each}
 	</div>
-</UserLayout>
+
+	{#if requests.length < total}
+		<div class="w-full mt-4 py-6 flex justify-center text-center">
+			<button class="primary w-52 text-lg" on:click={loadNext}>Load more</button
+			>
+		</div>
+	{/if}
+</div>
 
 <NewRequestDialog
 	bind:isOpen={isRequesting}

@@ -3,6 +3,7 @@
 	import type { TransferPayload } from "$models/transaction";
 	import { idrFormat } from "$utils/data";
 	import { createEventDispatcher } from "svelte";
+	import Money from "../data/Money.svelte";
 
 	import FormItem from "../input/FormItem.svelte";
 	import Dialog from "../overlay/Dialog.svelte";
@@ -37,7 +38,7 @@
 		<SpinnerOverlay {loading} />
 		<svelte:fragment slot="title">Transfer your money</svelte:fragment>
 
-		<form id="issueRequest" on:submit={submitHandler}>
+		<form id="sendRequest" on:submit={submitHandler}>
 			<div class="px-2 my-8 mb-12">
 				{#if balance !== undefined}
 					<div class="flex flex-col mb-4">
@@ -77,13 +78,21 @@
 						id="amount"
 						type="number"
 						pattern={`^\\d*(\\.\\d{0,2})?$`}
-						min="0"
+						min="0.0"
 						step=".01"
 						required
 						bind:value={value.money.amount}
 					/>
 					<div class="text-sm text-slate-600 self-end">Can be decimal.</div>
 				</FormItem>
+				<hr class="mb-2" />
+				<div class="flex justify-end">
+					<Money
+						class="text-2xl"
+						amount={value.money.amount}
+						currency={value.money.currency}
+					/>
+				</div>
 			</div>
 		</form>
 
@@ -93,7 +102,7 @@
 				class="primary variant-outline"
 				on:click={() => (isOpen = false)}>Cancel</button
 			>
-			<button type="submit" form="issueRequest" class="primary">Submit</button>
+			<button type="submit" form="sendRequest" class="primary">Submit</button>
 		</svelte:fragment>
 	</Dialog>
 </Overlay>

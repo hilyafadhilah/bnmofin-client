@@ -2,6 +2,7 @@
 	import type { CurrenciesResponse } from "$models/money";
 	import type { NewRequestPayload } from "$models/request";
 	import { createEventDispatcher } from "svelte";
+	import Money from "../data/Money.svelte";
 
 	import FormItem from "../input/FormItem.svelte";
 	import Dialog from "../overlay/Dialog.svelte";
@@ -31,9 +32,9 @@
 <Overlay class="flex flex-col items-center justify-center" bind:isOpen>
 	<Dialog class="w-full max-w-xl" on:close={() => (isOpen = false)}>
 		<SpinnerOverlay {loading} />
-		<svelte:fragment slot="title">Issue a request</svelte:fragment>
+		<svelte:fragment slot="title">Send a request</svelte:fragment>
 
-		<form id="issueRequest" on:submit={submitHandler}>
+		<form id="sendRequest" on:submit={submitHandler}>
 			<div class="px-2 my-8 mb-12">
 				<FormItem id="currency" label="Currency">
 					<select
@@ -60,6 +61,15 @@
 						Can be decimal, can be negative.
 					</div>
 				</FormItem>
+				<hr class="mb-2" />
+				<div class="flex justify-end">
+					<Money
+						class="text-2xl"
+						amount={value.money.amount}
+						currency={value.money.currency}
+						signed
+					/>
+				</div>
 			</div>
 		</form>
 
@@ -69,7 +79,7 @@
 				class="primary variant-outline"
 				on:click={() => (isOpen = false)}>Cancel</button
 			>
-			<button type="submit" form="issueRequest" class="primary">Submit</button>
+			<button type="submit" form="sendRequest" class="primary">Submit</button>
 		</svelte:fragment>
 	</Dialog>
 </Overlay>
