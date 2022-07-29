@@ -1,10 +1,13 @@
-import { AxiosError } from "axios";
+import axios from "axios";
 
 export function isTokenError(error: any) {
-	if (error instanceof AxiosError && error.response?.data?.error?.name) {
-		const name = error.response.data.error.name;
-		if (name === "InvalidToken" || name === "TokenExpired") {
-			return true;
+	if (axios.isAxiosError(error)) {
+		const data: any = error.response?.data;
+		if (data.error?.name) {
+			const name = data.error.name;
+			if (name === "InvalidToken" || name === "TokenExpired") {
+				return true;
+			}
 		}
 	}
 

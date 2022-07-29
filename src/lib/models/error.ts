@@ -1,4 +1,4 @@
-import { AxiosError } from "axios";
+import axios from "axios";
 
 export class AppError {
 	public title: string;
@@ -10,9 +10,10 @@ export class AppError {
 	}
 
 	static getTitle(error: any) {
-		if (error instanceof AxiosError) {
-			if (error.response?.data?.error?.title) {
-				return error.response.data.error.title;
+		if (axios.isAxiosError(error)) {
+			const data: any = error.response?.data
+			if (data.error?.title) {
+				return data.error.title;
 			}
 
 			return "Connection Error";
@@ -22,9 +23,10 @@ export class AppError {
 	}
 
 	static getMessage(error: any) {
-		if (error instanceof AxiosError) {
-			if (error.response?.data?.error?.message) {
-				return error.response.data.error.message;
+		if (axios.isAxiosError(error)) {
+			const data: any = error.response?.data
+			if (data.error?.message) {
+				return data.error.message;
 			}
 
 			return "Error while connecting to the server. Please try again later.";
