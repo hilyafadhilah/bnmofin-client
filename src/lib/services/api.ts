@@ -1,11 +1,12 @@
 import axios, { type AxiosRequestConfig } from "axios";
+import { apiConfig } from "$root/config";
 import type { ApiResponse } from "$models/api";
 import type { Auth, CurrentUser, LoginPayload } from "$models/auth";
-import type { RegisterPayload } from "../models/customer";
+import type { RegisterPayload } from "$models/customer";
 
 const fetch = axios.create({
-	baseURL: import.meta.env.VITE_API_URL,
-	timeout: 5000,
+	baseURL: apiConfig.url,
+	timeout: apiConfig.timeout,
 });
 
 async function login(payload: LoginPayload) {

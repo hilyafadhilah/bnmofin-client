@@ -1,7 +1,11 @@
 import TimeAgo from "javascript-time-ago";
 import en from "$root/assets/locales/timeago-en";
+import { moneyConfig } from "$root/config";
 
-export function moneyFormat(num: number, currency = "IDR") {
+export function moneyFormat(
+	num: number,
+	currency = moneyConfig.defaultCurrency.symbol
+) {
 	return new Intl.NumberFormat("id-ID", {
 		style: "currency",
 		currency,

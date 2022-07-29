@@ -1,8 +1,9 @@
 <script lang="ts">
+	import { moneyConfig } from "$root/config";
 	import { moneyFormat } from "$utils/data";
 
 	export let amount: number;
-	export let currency = "IDR";
+	export let currency = moneyConfig.defaultCurrency.symbol;
 	export let signed = false;
 	export let abs = false;
 	export let simple = false;

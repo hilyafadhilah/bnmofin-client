@@ -2,8 +2,9 @@
 	import type { CurrenciesResponse } from "$models/money";
 	import type { NewRequestPayload } from "$models/request";
 	import { createEventDispatcher } from "svelte";
-	import Money from "../data/Money.svelte";
+	import { moneyConfig } from "$root/config";
 
+	import Money from "../data/Money.svelte";
 	import FormItem from "../input/FormItem.svelte";
 	import Dialog from "../overlay/Dialog.svelte";
 	import Overlay from "../overlay/Overlay.svelte";
@@ -15,7 +16,7 @@
 	export let value: NewRequestPayload = {
 		money: {
 			amount: 0.0,
-			currency: "IDR",
+			currency: moneyConfig.defaultCurrency.symbol,
 		},
 	};
 

@@ -15,6 +15,7 @@
 	import TransferDialog from "$components/views/TransferDialog.svelte";
 	import ConfirmDialog from "$components/overlay/ConfirmDialog.svelte";
 	import Money from "$components/data/Money.svelte";
+	import { moneyConfig } from "$root/config";
 
 	// transactions data, if any
 
@@ -23,7 +24,7 @@
 	// currencies, has fallback
 
 	let currencies: CurrenciesResponse = {
-		IDR: "Indonesian Rupiah",
+		[moneyConfig.defaultCurrency.symbol]: moneyConfig.defaultCurrency.name,
 	};
 
 	api
@@ -44,7 +45,7 @@
 		payload = {
 			username: "",
 			money: {
-				currency: "IDR",
+				currency: moneyConfig.defaultCurrency.symbol,
 				amount: 100000,
 			},
 		};

@@ -23,6 +23,7 @@
 	import type { Auth } from "$models/auth";
 	import type { CurrenciesResponse } from "$models/money";
 	import ConfirmDialog from "../components/overlay/ConfirmDialog.svelte";
+	import { moneyConfig } from "$root/config";
 
 	export let fetchData: (
 		auth?: Auth,
@@ -85,7 +86,7 @@
 	// new request
 
 	let currencies: CurrenciesResponse = {
-		IDR: "Indonesian Rupiah",
+		[moneyConfig.defaultCurrency.symbol]: moneyConfig.defaultCurrency.name,
 	};
 
 	api
@@ -103,7 +104,7 @@
 		payload = {
 			money: {
 				amount: 100000.0,
-				currency: "IDR",
+				currency: moneyConfig.defaultCurrency.symbol,
 			},
 		};
 	};
