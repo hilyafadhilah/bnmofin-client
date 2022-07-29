@@ -1,6 +1,5 @@
 // eslint-disable-next-line import/no-unresolved
 import { sveltekit } from "@sveltejs/kit/vite";
-import path from "path";
 
 /** @type {import('vite').UserConfig} */
 const config = {

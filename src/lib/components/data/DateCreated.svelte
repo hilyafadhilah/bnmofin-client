@@ -1,5 +1,5 @@
 <script lang="ts">
-	import lightFormat from "date-fns/lightFormat";
+	import lightFormat from "date-fns/lightFormat/index";
 
 	export let date: Date;
 </script>
