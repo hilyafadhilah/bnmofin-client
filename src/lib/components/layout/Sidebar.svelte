@@ -16,7 +16,7 @@
 	$: maxWidth = expanded ? "16rem" : "6rem";
 
 	let screenW: number;
-	$: expanded = screenW >= 888;
+	$: expanded = screenW >= 888 || screenW == null;
 </script>
 
 <svelte:window bind:innerWidth={screenW} />

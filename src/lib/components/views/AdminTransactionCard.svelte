@@ -1,7 +1,8 @@
 <script lang="ts">
 	import type { TransactionResponse } from "$models/transaction";
-	import { timeAgo } from "$utils/data";
+	import DateCreated from "../data/DateCreated.svelte";
 	import Money from "../data/Money.svelte";
+	import TimeAgo from "../data/TimeAgo.svelte";
 
 	export let transaction: TransactionResponse;
 </script>
@@ -9,10 +10,10 @@
 <div class="card flex flex-col">
 	<div class="flex flex-wrap text-slate-500 text-sm justify-between">
 		<div class="flex-grow font-mono">
-			{transaction.created}
+			<DateCreated date={new Date(transaction.created)} />
 		</div>
 		<div class="flex-grow italic  text-right whitespace-nowrap">
-			{timeAgo.format(new Date(transaction.created))}
+			<TimeAgo date={new Date(transaction.created)} />
 		</div>
 	</div>
 	<div class="mt-4">

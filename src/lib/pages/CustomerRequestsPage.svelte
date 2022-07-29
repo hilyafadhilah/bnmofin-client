@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { session } from "$app/stores";
-	import { idrFormat, moneyFormat, timeAgo } from "$utils/data";
+	import { moneyFormat } from "$utils/data";
 	import { toast } from "$stores/toast";
 	import { api } from "$services/api";
 
@@ -9,6 +9,9 @@
 	import Refresh from "$components/icons/Refresh.svelte";
 	import Check from "$components/icons/Check.svelte";
 	import Cross from "$components/icons/Cross.svelte";
+	import TimeAgo from "$components/data/TimeAgo.svelte";
+	import DateCreated from "$components/data/DateCreated.svelte";
+	import Money from "$components/data/Money.svelte";
 
 	import { fastSlide } from "$transitions/fast-slide";
 
@@ -181,24 +184,19 @@
 			>
 				<div class="flex flex-wrap text-slate-500 text-sm justify-between">
 					<div class="flex-grow font-mono">
-						{request.created}
+						<DateCreated date={new Date(request.created)} />
 					</div>
 					<div class="flex-grow italic  text-right whitespace-nowrap">
-						{timeAgo.format(new Date(request.created))}
+						<TimeAgo date={new Date(request.created)} />
 					</div>
 				</div>
 				<hr class="my-2" />
 				<div class="flex justify-end font-mono text-md sm:text-lg">
-					<div
-						class="
-								p-2 rounded-md amount
-								{request.amount > 0 ? 'positive-amount' : 'negative-amount'}
-							"
-					>
-						{request.amount > 0
-							? "+" + idrFormat(request.amount)
-							: idrFormat(request.amount)}
-					</div>
+					<Money
+						amount={request.amount}
+						signed
+						unstyled={request.response?.status !== 'accepted'}
+					/>
 				</div>
 				<hr class="my-2" />
 				<div
@@ -254,14 +252,5 @@
 	}
 	.pending {
 		@apply bg-slate-50;
-	}
-	.accepted .amount {
-		@apply text-white;
-	}
-	.accepted .positive-amount {
-		@apply bg-emerald-600;
-	}
-	.accepted .negative-amount {
-		@apply bg-rose-500;
 	}
 </style>

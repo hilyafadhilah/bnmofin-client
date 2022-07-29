@@ -1,24 +1,25 @@
 <script lang="ts">
 	import { getStorage, ref, getDownloadURL } from "firebase/storage";
 	import type { AdminCustomerResponse } from "$models/customer";
-	import { idrFormat } from "$utils/data";
 	import Image from "../data/Image.svelte";
 	import Spin from "../icons/Spin.svelte";
 
 	import Dialog from "../overlay/Dialog.svelte";
 	import Overlay from "../overlay/Overlay.svelte";
 	import { createEventDispatcher } from "svelte";
+	import Money from "../data/Money.svelte";
+	import DateCreated from "../data/DateCreated.svelte";
 
 	export let isOpen = false;
-	export let data: AdminCustomerResponse;
+	export let customer: AdminCustomerResponse;
 	export let admin = false;
 
 	const storage = getStorage();
 	let imgSrc = "";
 
-	$: if (data) {
+	$: if (customer) {
 		imgSrc = "";
-		getDownloadURL(ref(storage, data.idCardImage))
+		getDownloadURL(ref(storage, customer.idCardImage))
 			.then((src) => (imgSrc = src))
 			.catch(() => (imgSrc = "error"));
 	}
@@ -31,40 +32,34 @@
 <Overlay class="flex flex-col items-center justify-center" bind:isOpen>
 	<Dialog class="w-full max-w-xl" on:close={() => (isOpen = false)}>
 		<svelte:fragment slot="title">
-			@{data.user.username}
+			@{customer.user.username}
 		</svelte:fragment>
 
 		<div class="mt-4 px-2 flex flex-col gap-4">
 			<div>
 				<div class="uppercase font-bold text-sm text-slate-500">Username</div>
 				<div class="text-xl font-semibold">
-					@{data.user.username}
+					@{customer.user.username}
 				</div>
 			</div>
 			<div>
 				<div class="uppercase font-bold text-sm text-slate-500">Fullname</div>
 				<div class="text-lg font-semibold">
-					{data.fullname}
+					{customer.fullname}
 				</div>
 			</div>
-			{#if data.status === "verified"}
+			{#if customer.status === "verified"}
 				<div>
 					<div class="uppercase font-bold text-sm text-slate-500">Balance</div>
 					<div class="flex text-xl font-mono">
-						<div
-							class="p-2 rounded-sm text-white break-words
-							{data.balance > 0 ? 'bg-emerald-600' : 'bg-rose-500'}
-						"
-						>
-							{idrFormat(data.balance)}
-						</div>
+						<Money amount={customer.balance} />
 					</div>
 				</div>
 			{/if}
 			<div>
 				<div class="uppercase font-bold text-sm text-slate-500">Status</div>
 				<div class="text-lg font-semibold capitalize">
-					{data.status}
+					{customer.status}
 				</div>
 			</div>
 			<div>
@@ -72,7 +67,7 @@
 					Registered on
 				</div>
 				<div class="text-lg font-semibold capitalize">
-					{data.created}
+					<DateCreated date={new Date(customer.created)} />
 				</div>
 			</div>
 			<div>
@@ -81,7 +76,7 @@
 					<div class="w-full h-72 mx-auto flex items-center justify-center">
 						<Image
 							src={imgSrc}
-							alt="ID Card of {data.fullname}"
+							alt="ID Card of {customer.fullname}"
 							class="w-auto h-full mx-auto"
 							bind:loaded={imageLoaded}
 						>
@@ -96,24 +91,24 @@
 			<!-- <table class="w-full">
 				<tr>
 					<td>Username</td>
-					<td>@{data.user.username}</td>
+					<td>@{customer.user.username}</td>
 				</tr>
 				<tr>
 					<td>Fullname</td>
-					<td>{data.fullname}</td>
+					<td>{customer.fullname}</td>
 				</tr>
 				{#if admin}
 					<tr>
 						<td>Balance</td>
-						<td>{data.status === "verified" ? idrFormat(data.balance) : "-"}</td>
+						<td>{customer.status === "verified" ? idrFormat(customer.balance) : "-"}</td>
 					</tr>
 					<tr>
 						<td>Created</td>
-						<td>{data.created}</td>
+						<td>{customer.created}</td>
 					</tr>
 					<tr>
 						<td>Status</td>
-						<td>{data.status}</td>
+						<td>{customer.status}</td>
 					</tr>
 					<tr>
 						<td colspan="2">ID Card</td>
@@ -123,7 +118,7 @@
 							<div class="w-full h-72 mx-auto flex items-center justify-center">
 								<Image
 									src={imgSrc}
-									alt="ID Card of {data.fullname}"
+									alt="ID Card of {customer.fullname}"
 									class="w-auto h-full mx-auto"
 									bind:loaded={imageLoaded}
 								>
@@ -137,10 +132,10 @@
 		</div>
 
 		<svelte:fragment slot="actions">
-			{#if admin && data.status === "unverified"}
+			{#if admin && customer.status === "unverified"}
 				<button
 					class="primary w-full"
-					on:click={() => dispatch("verify", data)}
+					on:click={() => dispatch("verify", customer)}
 					disabled={!imageLoaded}
 				>
 					Verify

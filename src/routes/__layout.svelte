@@ -40,7 +40,7 @@
 
 	let loading = false;
 
-	beforeNavigate(() => (loading = true));
+	beforeNavigate(({ from, to }) => (loading = from.host === to?.host));
 	afterNavigate(() => (loading = false));
 </script>
 

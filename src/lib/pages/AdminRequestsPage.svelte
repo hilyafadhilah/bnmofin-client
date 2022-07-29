@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { session } from "$app/stores";
-	import { idrFormat, timeAgo } from "$utils/data";
+	import { idrFormat } from "$utils/data";
 	import { toast } from "$stores/toast";
 	import { api } from "$services/api";
 
@@ -9,8 +9,11 @@
 	import Refresh from "$components/icons/Refresh.svelte";
 	import Cross from "$components/icons/Cross.svelte";
 	import Check from "$components/icons/Check.svelte";
+	import Money from "$components/data/Money.svelte";
+	import TimeAgo from "$components/data/TimeAgo.svelte";
+	import DateCreated from "$components/data/DateCreated.svelte";
 
-	import { fastSlide } from "../transitions/fast-slide";
+	import { fastSlide } from "$transitions/fast-slide";
 
 	import type {
 		AdminRequestResponse,
@@ -20,7 +23,6 @@
 	} from "$models/request";
 	import type { Auth } from "$models/auth";
 	import type { ApiResponse } from "$models/api";
-	import Money from "../components/data/Money.svelte";
 
 	export let fetchData: (
 		auth?: Auth,
@@ -108,8 +110,8 @@
 				confirmLoading = true;
 
 				const newResponse = await api.send<
-					RespondRequestPayload,
-					RespondRequestResponse
+				RespondRequestPayload,
+				RespondRequestResponse
 				>(`request/${selected.id}/response`, {
 					method: "post",
 					payload: { status: newStatus },
@@ -180,37 +182,34 @@
 					? request.response.status === 'accepted'
 						? 'responded accepted'
 						: 'responded declined'
-					: 'awaiting'}
+					: 'pending'}
 					"
 				transition:fastSlide|local={{ axis: "Y", direction: "+" }}
 			>
 				<div class="flex flex-wrap text-slate-500 text-sm justify-between">
 					<div class="flex-grow font-mono">
-						{request.created}
+						<DateCreated date={new Date(request.created)} />
 					</div>
 					<div class="flex-grow italic  text-right whitespace-nowrap">
-						{timeAgo.format(new Date(request.created))}
+						<TimeAgo date={new Date(request.created)} />
 					</div>
 				</div>
-				<div class="mt-4 text-lg font-semibold">
+				<div class="mt-4 text-lg font-semibold text-slate-700">
 					@{request.customer.user.username}
 				</div>
-				<div class="mt-2 text-sm font-bold text-slate-500">BALANCE:</div>
+				<div class="mt-2 text-sm font-bold text-slate-500 uppercase">
+					Balance:
+				</div>
 				<div class="font-mono text-slate-500">
 					{idrFormat(request.customer.balance)}
 				</div>
 				<hr class="my-2" />
-				<div class="flex justify-end font-mono text-md sm:text-lg">
-					<div
-						class="
-								p-2 rounded-md amount
-								{request.amount > 0 ? 'positive-amount' : 'negative-amount'}
-							"
-					>
-						{request.amount > 0
-							? "+" + idrFormat(request.amount)
-							: idrFormat(request.amount)}
-					</div>
+				<div class="flex justify-end font-mono text-md sm:text-lg amount">
+					<Money
+						amount={request.amount}
+						signed
+						unstyled={request.response != null}
+					/>
 				</div>
 				<hr class="my-2" />
 				<div
@@ -309,16 +308,13 @@
 	.responded {
 		@apply bg-slate-50;
 	}
-	.awaiting {
+	.pending {
 		@apply bg-amber-50 border-amber-200 hover:border-amber-300;
 	}
-	.awaiting .amount {
-		@apply text-white;
+	.declined .amount {
+		@apply text-slate-300 transition-colors;
 	}
-	.awaiting .positive-amount {
-		@apply bg-emerald-600;
-	}
-	.awaiting .negative-amount {
-		@apply bg-rose-500;
+	.declined:hover .amount {
+		@apply text-slate-600;
 	}
 </style>

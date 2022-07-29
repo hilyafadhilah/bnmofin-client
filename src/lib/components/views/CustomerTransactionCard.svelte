@@ -1,22 +1,23 @@
 <script lang="ts">
 	import type { TransactionResponse } from "$models/transaction";
 	import type { Auth } from "$models/auth";
-	import { idrFormat, timeAgo } from "$utils/data";
+	import DateCreated from "../data/DateCreated.svelte";
+	import TimeAgo from "../data/TimeAgo.svelte";
+	import Money from "../data/Money.svelte";
 
 	export let transaction: TransactionResponse;
 	export let auth: Auth;
 
 	const isSender = transaction.senderId === auth.user.id;
-	const type = isSender ? "-" : "+";
 </script>
 
 <div class="card flex flex-col">
 	<div class="flex flex-wrap text-slate-500 text-sm justify-between">
 		<div class="flex-grow font-mono">
-			{transaction.created}
+			<DateCreated date={new Date(transaction.created)} />
 		</div>
 		<div class="flex-grow italic  text-right whitespace-nowrap">
-			{timeAgo.format(new Date(transaction.created))}
+			<TimeAgo date={new Date(transaction.created)} />
 		</div>
 	</div>
 	{#if !isSender}
@@ -36,13 +37,6 @@
 	{/if}
 	<hr class="my-2" />
 	<div class="flex justify-end font-mono text-lg sm:text-xl">
-		<div
-			class="
-			p-2 rounded-md text-white
-			{isSender ? 'bg-rose-500' : 'bg-emerald-600'}
-		"
-		>
-			{type}{idrFormat(transaction.amount)}
-		</div>
+		<Money amount={isSender ? -transaction.amount : transaction.amount} signed />
 	</div>
 </div>

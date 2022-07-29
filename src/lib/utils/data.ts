@@ -15,5 +15,5 @@ export function moneyFormat(num: number, currency: string) {
 	}).format(num);
 }
 
-TimeAgo.addDefaultLocale(en);
+TimeAgo.addLocale(en);
 export const timeAgo = new TimeAgo("en-US");

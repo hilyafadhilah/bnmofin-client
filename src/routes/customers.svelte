@@ -38,11 +38,12 @@
 <script lang="ts">
 	import ConfirmDialog from "$components/overlay/ConfirmDialog.svelte";
 	import { session } from "$app/stores";
-	import { idrFormat, timeAgo } from "$utils/data";
 	import ViewCustomerDialog from "$components/views/ViewCustomerDialog.svelte";
 	import type { ApiResponse } from "$models/api";
 	import SpinnerOverlay from "$components/overlay/SpinnerOverlay.svelte";
 	import Refresh from "$components/icons/Refresh.svelte";
+	import Money from "$root/lib/components/data/Money.svelte";
+	import TimeAgo from "$root/lib/components/data/TimeAgo.svelte";
 
 	export let response: ApiResponse<AdminCustomerResponse[]>;
 
@@ -182,16 +183,12 @@
 				<div class="text-xl font-semibold">@{customer.user.username}</div>
 				<div>{customer.fullname}</div>
 				<div class="text-right text-sm italic text-slate-500">
-					signed up {timeAgo.format(new Date(customer.created))}
+					signed up <TimeAgo date={new Date(customer.created)} />
 				</div>
 				<hr class="my-2 -mx-2" />
 				{#if customer.status === "verified"}
-					<div
-						class="font-mono text-right
-									{customer.balance > 0 ? 'text-emerald-500' : 'text-rose-500'}
-								"
-					>
-						{idrFormat(customer.balance)}
+					<div class="flex justify-end">
+						<Money amount={customer.balance} simple />
 					</div>
 				{:else}
 					<div class="text-center"><i>unverified</i></div>
@@ -211,7 +208,7 @@
 {#if selected}
 	<ViewCustomerDialog
 		bind:isOpen={showDetails}
-		data={selected}
+		customer={selected}
 		admin
 		on:verify={confirmVerify}
 	/>
