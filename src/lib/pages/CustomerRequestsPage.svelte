@@ -92,7 +92,7 @@
 	api
 		.get<CurrenciesResponse>("/currency/symbols")
 		.then((data) => (currencies = data))
-		.catch(toast.catchError());
+		.catch(toast.catchError);
 
 	let isRequesting = false;
 	let showConfirm = false;
@@ -143,8 +143,8 @@
 
 		try {
 			const request = await api.send<
-				NewRequestPayload,
-				CustomerRequestResponse
+			NewRequestPayload,
+			CustomerRequestResponse
 			>("/request", {
 				method: "post",
 				payload,
@@ -164,6 +164,7 @@
 			requests = [...requests];
 
 			reset();
+			showConfirm = false;
 			isRequesting = false;
 		} catch (error) {
 			toast.error(error);

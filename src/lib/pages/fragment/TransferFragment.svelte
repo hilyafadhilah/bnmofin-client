@@ -30,7 +30,7 @@
 	api
 		.get<CurrenciesResponse>("/currency/symbols")
 		.then((data) => (currencies = data))
-		.catch(toast.catchError());
+		.catch(toast.catchError);
 
 	// state
 
