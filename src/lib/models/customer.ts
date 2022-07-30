@@ -1,3 +1,4 @@
+import type { ApiStringFilter } from "./api";
 import type { AuthRole } from "./auth";
 
 export type CustomerStatus = "verified" | "unverified";
@@ -44,3 +45,8 @@ export interface CustomerCustomerResponse {
 export type CustomerResponse<T extends AuthRole> = T extends AuthRole.Admin
 	? AdminCustomerResponse
 	: CustomerCustomerResponse;
+
+export interface CustomerQuery {
+	username?: ApiStringFilter;
+	fullname?: ApiStringFilter;
+}

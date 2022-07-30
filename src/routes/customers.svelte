@@ -3,15 +3,26 @@
 	import { toast } from "$stores/toast";
 
 	import type { Load } from "@sveltejs/kit";
-	import type { AdminCustomerResponse } from "$models/customer";
+	import type { AdminCustomerResponse, CustomerQuery } from "$models/customer";
 	import { AuthRole, type Auth } from "$models/auth";
 	import { UnauthorizedError } from "$models/error";
 
-	function fetchData(auth?: Auth, skip = 0, take = 25) {
+	function fetchData({
+		auth,
+		skip = 0,
+		take = 25,
+		query = {},
+	}: {
+		auth?: Auth;
+		skip?: number;
+		take?: number;
+		query?: CustomerQuery;
+	} = {}) {
 		return api.getMany<AdminCustomerResponse[]>("/customer", {
 			auth,
 			skip,
 			take,
+			query: query as Record<string, any>,
 		});
 	}
 
@@ -24,7 +35,9 @@
 			};
 		}
 
-		const response = await fetchData(session.auth).catch(toast.forwardError());
+		const response = await fetchData({ auth: session.auth }).catch(
+			toast.forwardError()
+		);
 
 		return {
 			stuff: { title: "Customers" },
@@ -44,6 +57,8 @@
 	import Refresh from "$components/icons/Refresh.svelte";
 	import Money from "$components/data/Money.svelte";
 	import TimeAgo from "$components/data/TimeAgo.svelte";
+	import HighlightText from "$components/data/HighlightText.svelte";
+	import Search from "$components/icons/Search.svelte";
 
 	export let response: ApiResponse<AdminCustomerResponse[]>;
 
@@ -53,12 +68,22 @@
 	let total: number;
 	$: total = response.meta.total;
 
+	let filterValue: string | undefined;
+	let filter: string;
+	$: filter = filterValue ? filterValue.trim() : "";
+
+	let query: CustomerQuery;
+	$: query = {
+		username: filter ? { startsWith: filter } : undefined,
+		fullname: filter ? { startsWith: filter } : undefined,
+	};
+
 	let loading = false;
 
 	const reload = async () => {
 		loading = true;
 		try {
-			response = await fetchData($session.auth);
+			response = await fetchData({ auth: $session.auth, query });
 		} catch (err) {
 			toast.error(err);
 		} finally {
@@ -69,7 +94,10 @@
 	const loadNext = async () => {
 		loading = true;
 		try {
-			const { meta, data } = await fetchData($session.auth, customers.length);
+			const { meta, data } = await fetchData({
+				auth: $session.auth,
+				skip: customers.length,
+			});
 
 			if (meta.total === total) {
 				customers = customers.concat(data);
@@ -94,7 +122,7 @@
 	};
 
 	const loadNew = async (take: number, skip = 0) => {
-		const { meta, data } = await fetchData($session.auth, skip, take);
+		const { meta, data } = await fetchData({ auth: $session.auth, skip, take });
 
 		if (meta.take < take) {
 			data.push(...(await loadNew(take - meta.take, skip + meta.take)));
@@ -155,11 +183,34 @@
 	<div class="flex-grow">
 		<h2 class="font-serif">Customers</h2>
 	</div>
-	<div class="flex items-center gap-2">
-		<button type="button" class="icon" on:click={reload}>
-			<Refresh class="text-slate-500" />
-		</button>
-	</div>
+	<dic class="flex flex-wrap justify-end" style="flex-basis: 512px;">
+		<div class="flex-grow flex">
+			<input
+				type="text"
+				title="Search Customer"
+				placeholder="Customer username or fullname..."
+				class="rounded-r-none"
+				bind:value={filterValue}
+				on:change={reload}
+			/>
+			<button
+				type="button"
+				class="primary right-button"
+				on:click={() => {
+					if (filter) {
+						reload();
+					}
+				}}
+			>
+				<Search class="h-5 w-5" />
+			</button>
+		</div>
+		<div class="mx-2 flex items-center gap-2">
+			<button type="button" class="icon" title="Refresh" on:click={reload}>
+				<Refresh class="text-slate-500" />
+			</button>
+		</div>
+	</dic>
 </div>
 
 <div class="w-full overflow-x-auto rounded-md" class:overflow-hidden={loading}>
@@ -172,7 +223,7 @@
 				column-gap: .8rem;
 			"
 	>
-		{#each customers as customer}
+		{#each customers as customer (customer)}
 			<div
 				class="clickable-card"
 				class:bg-amber-50={customer.status === "unverified"}
@@ -180,8 +231,18 @@
 				tabindex="0"
 				on:click={() => openDetails(customer)}
 			>
-				<div class="text-xl font-semibold">@{customer.user.username}</div>
-				<div>{customer.fullname}</div>
+				<div class="text-xl font-semibold">
+					@<HighlightText
+						value={customer.user.username}
+						filter={new RegExp("^" + filter)}
+					/>
+				</div>
+				<div>
+					<HighlightText
+						value={customer.fullname}
+						filter={new RegExp("^" + filter)}
+					/>
+				</div>
 				<div class="text-right text-sm italic text-slate-500">
 					signed up <TimeAgo date={new Date(customer.created)} />
 				</div>

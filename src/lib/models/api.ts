@@ -34,3 +34,9 @@ export interface ErrorResponse<T = any> {
 	};
 	data: T;
 }
+
+export type ApiStringFilter =
+	| { is: string }
+	| { startsWith: string }
+	| { endsWith: string }
+	| { startsWith: string; endsWith: string };

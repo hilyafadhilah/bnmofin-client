@@ -1,8 +1,15 @@
 <script lang="ts">
+	import { browser } from "$app/env";
 	import { fade } from "svelte/transition";
+
 	export let isOpen = false;
 	export let persistent = false;
 	export let duration = 300;
+	export let scroll = false;
+
+	$: if (browser && !scroll) {
+		document.body.style.overflowY = isOpen ? "hidden" : "";
+	}
 </script>
 
 {#if isOpen}

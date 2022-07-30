@@ -82,4 +82,8 @@
 		@apply text-red-500
 			hover:bg-red-300 hover:bg-opacity-30;
 	}
+
+	button.right-button {
+		@apply rounded-l-none;
+	}
 }
