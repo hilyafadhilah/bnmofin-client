@@ -1,38 +1,65 @@
-# create-svelte
+# bnmofin-client
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+13520024 Hilya Fadhilah Imania
 
-## Creating a project
+## Stack
 
-If you're seeing this, you've probably already done this step. Congrats!
+- Svelte with SvelteKit (comes with Vite)
+- Tailwind CSS
 
-```bash
-# create a new project in the current directory
-npm init svelte
+### Tools
 
-# create a new project in my-app
-npm init svelte my-app
+- Axios
+- Firebase Client
+- `es-cookie`
+- `javascript-time-ago`, `date-fns`
+
+## Setup
+
+### Environment
+
+Working configurations are already present in `.env.example`. If the `bnmofin-api`
+server is up, you can run this client without needing to start a local server
+instance yourself.
+
+#### API
+
+- `VITE_API_URL`: URL of bnmofin-api server
+- `VITE_API_TIMEOUT`: Optional. Timeout in milliseconds.
+
+#### Firebase
+
+There are two ways you can configure firebase through the environment.
+
+You can put all the configuration in one variable called
+`VITE_FIREBASE_CONFIG` as JSON. Working example is provided.
+
+The other option is to manually put every relevant information in each
+respective variables:
+
+```
+VITE_FIREBASE_APIKEY=...
+VITE_FIREBASE_AUTHDOMAIN=...
+VITE_FIREBASE_PROJECTID=...
+VITE_FIREBASE_STORAGEBUCKET=...
+VITE_FIREBASE_MESSAGINGID=...
+VITE_FIREBASE_APPID=...
+VITE_FIREBASE_MEASUREMENTID=...
 ```
 
-## Developing
+> If there is a `VITE_FIREBASE_CONFIG` variable set, the app will use it
+> instead of the individual variables.
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+### Build & run
 
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+```
+$ yarn
+$ yarn build
+$ yarn preview
 ```
 
-## Building
+### Development
 
-To create a production version of your app:
-
-```bash
-npm run build
 ```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+$ yarn dev
+```
