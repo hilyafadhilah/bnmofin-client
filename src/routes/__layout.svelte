@@ -50,7 +50,9 @@
 	>
 </svelte:head>
 
-{#if $session.auth?.user}
+{#if $page.error}
+	<slot />
+{:else if $session.auth?.user}
 	<UserLayout>
 		<slot />
 	</UserLayout>

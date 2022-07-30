@@ -3,6 +3,16 @@ import { isInRoute } from "../utils/component";
 
 export type VisitorRole = "guest" | "customer" | "admin";
 
+const routes = [
+	"/",
+	"/login",
+	"/register",
+	"/customers",
+	"/requests",
+	"/transactions",
+	"/logout",
+];
+
 const whitelist: Record<VisitorRole, string[]> = {
 	guest: ["/login", "/register"],
 	customer: ["/", "/requests", "/transactions", "/logout"],
@@ -28,7 +38,10 @@ const redirects = {
 };
 
 function isAuthorized(role: VisitorRole, path: string) {
-	return whitelist[role].some((route) => isInRoute(path, route));
+	return (
+		!routes.includes(path) ||
+		whitelist[role].some((route) => isInRoute(path, route))
+	);
 }
 
 export const routeGuard = {
