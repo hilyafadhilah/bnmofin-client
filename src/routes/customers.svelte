@@ -183,34 +183,35 @@
 	<div class="flex-grow">
 		<h2 class="font-serif">Customers</h2>
 	</div>
-	<dic class="flex flex-wrap justify-end" style="flex-basis: 512px;">
-		<div class="flex-grow flex">
-			<input
-				type="text"
-				title="Search Customer"
-				placeholder="Customer username or fullname..."
-				class="rounded-r-none"
-				bind:value={filterValue}
-				on:change={reload}
-			/>
-			<button
-				type="button"
-				class="primary right-button"
-				on:click={() => {
-					if (filter) {
-						reload();
-					}
-				}}
-			>
-				<Search class="h-5 w-5" />
-			</button>
-		</div>
-		<div class="mx-2 flex items-center gap-2">
-			<button type="button" class="icon" title="Refresh" on:click={reload}>
-				<Refresh class="text-slate-500" />
-			</button>
-		</div>
-	</dic>
+	<div class="mx-2 flex items-center gap-2">
+		<button type="button" class="icon" title="Refresh" on:click={reload}>
+			<Refresh class="text-slate-500" />
+		</button>
+	</div>
+</div>
+
+<div class="mb-4">
+	<div class="flex">
+		<input
+			type="text"
+			title="Search Customer"
+			placeholder="Username or fullname..."
+			class="rounded-r-none"
+			bind:value={filterValue}
+			on:change={reload}
+		/>
+		<button
+			type="button"
+			class="primary right-button"
+			on:click={() => {
+				if (filter) {
+					reload();
+				}
+			}}
+		>
+			<Search class="h-5 w-5" />
+		</button>
+	</div>
 </div>
 
 <div class="w-full overflow-x-auto rounded-md" class:overflow-hidden={loading}>
