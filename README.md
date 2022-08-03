@@ -4,7 +4,7 @@
 
 ## Stack
 
-- Svelte with SvelteKit (comes with Vite)
+- Svelte `3.x` with SvelteKit (comes with Vite)
 - Tailwind CSS
 
 ### Tools
@@ -63,3 +63,8 @@ $ yarn preview
 ```
 $ yarn dev
 ```
+
+### Deployment
+
+The `master` branch is deployed and live on <https://bnmofin-client.vercel.app>
+using Vercel automatic deployment.
